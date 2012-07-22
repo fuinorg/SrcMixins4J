@@ -13,6 +13,7 @@
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>SrcMixins4J Parent</name>
+    <description>Source code based mixins for Java</description>
 
     <licenses>
         <license>
@@ -87,5 +88,4 @@
 
     </repositories>
     
-    <description>Source code based mixins for Java</description>
 </project>
