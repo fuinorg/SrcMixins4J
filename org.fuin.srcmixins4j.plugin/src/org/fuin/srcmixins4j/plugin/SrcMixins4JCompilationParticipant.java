@@ -29,7 +29,7 @@ import org.emftext.language.java.resource.java.mopp.JavaMarkerHelper;
 /**
  * Adds/Removes mixin related code from the compiled classes.
  */
-public final class SrcMixin4JCompilationParticipant extends CompilationParticipant {
+public final class SrcMixins4JCompilationParticipant extends CompilationParticipant {
 
     private IJavaProject project;
 
@@ -53,13 +53,13 @@ public final class SrcMixin4JCompilationParticipant extends CompilationParticipa
             return;
         }
 
-        final ResourceSet resourceSet = SrcMixin4JPlugin.getDefault()
+        final ResourceSet resourceSet = SrcMixins4JPlugin.getDefault()
                 .getResourceSet(project);
 
         for (final BuildContext buildContext : buildContexts) {
             final Resource resource = loadResource(resourceSet,
                     buildContext.getFile());
-            new SrcMixin4JAnalysis().analyze(project, buildContext, resourceSet,
+            new SrcMixins4JAnalysis().analyze(project, buildContext, resourceSet,
                     resource);
 
         }

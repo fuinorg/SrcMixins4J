@@ -4,8 +4,8 @@
 
    <extension point="org.eclipse.jdt.core.compilationParticipant">
       <compilationParticipant
-            class="org.fuin.srcmixins4j.plugin.SrcMixin4JCompilationParticipant"
-            id="org.fuin.srcmixins4j.plugin.SrcMixin4JCompilationParticipant">
+            class="org.fuin.srcmixins4j.plugin.SrcMixins4JCompilationParticipant"
+            id="org.fuin.srcmixins4j.plugin.SrcMixins4JCompilationParticipant">
       </compilationParticipant>
    </extension>
 

@@ -11,7 +11,7 @@
 
     <artifactId>org.fuin.srcmixins4j.plugin</artifactId>
     <packaging>eclipse-plugin</packaging>
-    <name>SrcMixin4J Plugin</name>
+    <name>SrcMixins4J Plugin</name>
 
     <dependencies>
 

@@ -69,12 +69,12 @@ import org.fuin.srcmixins4j.annotations.MixinProvider;
 /**
  * Generates code for a mixin.
  */
-public final class SrcMixin4JUtils {
+public final class SrcMixins4JUtils {
 
     /**
      * Private default constructor.
      */
-    private SrcMixin4JUtils() {
+    private SrcMixins4JUtils() {
         throw new UnsupportedOperationException(
                 "Creating an instance of this utility class is not allowed");
     }

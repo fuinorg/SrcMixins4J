@@ -29,9 +29,9 @@ import org.osgi.framework.BundleContext;
 /**
  * Handles mixin source code generation in Eclipse.
  */
-public final class SrcMixin4JPlugin extends Plugin {
+public final class SrcMixins4JPlugin extends Plugin {
 
-    private static SrcMixin4JPlugin plugin;
+    private static SrcMixins4JPlugin plugin;
 
     private ResourceSet resourceSet = null;
 
@@ -54,7 +54,7 @@ public final class SrcMixin4JPlugin extends Plugin {
      *
      * @return Plugin.
      */
-    public static SrcMixin4JPlugin getDefault() {
+    public static SrcMixins4JPlugin getDefault() {
         return plugin;
     }
 

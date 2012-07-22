@@ -47,12 +47,12 @@ import org.emftext.language.java.resource.java.JavaEProblemType;
 import org.emftext.language.java.resource.java.mopp.JavaResource;
 import org.fuin.srcmixins4j.annotations.MixinIntf;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
-import org.fuin.srcmixins4j.core.SrcMixin4JUtils;
+import org.fuin.srcmixins4j.core.SrcMixins4JUtils;
 
 /**
  * Analyzes resources and applies mixin code.
  */
-public final class SrcMixin4JAnalysis {
+public final class SrcMixins4JAnalysis {
 
     /**
      * Analyze the given resource.
@@ -80,11 +80,11 @@ public final class SrcMixin4JAnalysis {
         for (final ConcreteClassifier classifier : classifiers) {
             if (classifier instanceof Class) {
                 final Class clasz = (Class) classifier;
-                final AnnotationInstance mixinProviderAnnotation = SrcMixin4JUtils
+                final AnnotationInstance mixinProviderAnnotation = SrcMixins4JUtils
                         .getAnnotationInstance(clasz,
                                 MixinProvider.class.getName());
                 if (mixinProviderAnnotation == null) {
-                    final List<Interface> mixinInterfaces = SrcMixin4JUtils
+                    final List<Interface> mixinInterfaces = SrcMixins4JUtils
                             .getMixinInterfaces(clasz);
                     if (mixinInterfaces.size() == 0) {
                         handleStandardClassChanged(javaProject, buildContext,
@@ -99,7 +99,7 @@ public final class SrcMixin4JAnalysis {
                 }
             } else if (classifier instanceof Interface) {
                 final Interface intf = (Interface) classifier;
-                if (SrcMixin4JUtils.getAnnotationInstance(intf,
+                if (SrcMixins4JUtils.getAnnotationInstance(intf,
                         MixinIntf.class.getName()) != null) {
                     handleMixinIntfChanged(javaProject, buildContext, resource,
                             intf);
@@ -138,7 +138,7 @@ public final class SrcMixin4JAnalysis {
 
         System.out.println(clasz.getName() + " is a mixin provider");
 
-        final Interface mixinIntf = SrcMixin4JUtils.getMixinInterface(clasz);
+        final Interface mixinIntf = SrcMixins4JUtils.getMixinInterface(clasz);
         if (mixinIntf == null) {
             // Should never happen because @MixinProvider has no default
             // parameter value
@@ -151,7 +151,7 @@ public final class SrcMixin4JAnalysis {
         for (final Class mixinUser : mixinUsers) {
             System.out.println("    " + mixinUser.getName() + " uses mixin "
                     + mixinIntf.getName());
-            final List<Interface> mixinInterfaces = SrcMixin4JUtils
+            final List<Interface> mixinInterfaces = SrcMixins4JUtils
                     .getMixinInterfaces(mixinUser);
             handleMixinUserChanged(project, buildContext,
                     mixinUser.eResource(), mixinUser, mixinInterfaces);
@@ -165,7 +165,7 @@ public final class SrcMixin4JAnalysis {
 
         System.out.println(clasz.getName() + " is a standard class");
 
-        SrcMixin4JUtils.removeAllMixinMembers(clasz);
+        SrcMixins4JUtils.removeAllMixinMembers(clasz);
         save(buildContext, resource);
 
     }
@@ -176,14 +176,14 @@ public final class SrcMixin4JAnalysis {
 
         System.out.println(clasz.getName() + " is a mixin user");
 
-        SrcMixin4JUtils.removeAllMixinMembers(clasz);
+        SrcMixins4JUtils.removeAllMixinMembers(clasz);
 
         for (Interface mixinIntf : mixinIntfs) {
             System.out.print("    " + mixinIntf.getName());
             final Class provider = findMixinProvider(mixinIntf, javaProject);
             if (provider != null) {
                 System.out.println(" implemented by " + provider.getName());
-                SrcMixin4JUtils.applyMixin(clasz, provider, mixinIntf);
+                SrcMixins4JUtils.applyMixin(clasz, provider, mixinIntf);
             }
         }
 
@@ -216,10 +216,10 @@ public final class SrcMixin4JAnalysis {
                     .getFullyQualifiedName());
             if (cc instanceof Class) {
                 final Class clasz = (Class) cc;
-                final AnnotationInstance ai = SrcMixin4JUtils
+                final AnnotationInstance ai = SrcMixins4JUtils
                         .getAnnotationInstance(clasz,
                                 MixinProvider.class.getName());
-                final Interface intf = SrcMixin4JUtils
+                final Interface intf = SrcMixins4JUtils
                         .getSingleAnnotationInterfaceParameter(ai);
                 if (intf == mixinIntf) {
                     return clasz;
@@ -271,7 +271,7 @@ public final class SrcMixin4JAnalysis {
             return new ArrayList<Class>();
         }
 
-        final String mixinIntfName = SrcMixin4JUtils
+        final String mixinIntfName = SrcMixins4JUtils
                 .getFullQualifiedName(mixinIntf);
 
         final SearchPattern mixinUsers = SearchPattern.createPattern(

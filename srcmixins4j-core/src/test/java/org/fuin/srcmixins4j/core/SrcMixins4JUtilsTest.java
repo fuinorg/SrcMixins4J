@@ -50,16 +50,16 @@ import org.emftext.language.java.types.NamespaceClassifierReference;
 import org.emftext.language.java.types.Type;
 import org.fuin.srcmixins4j.annotations.MixinGenerated;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
-import org.fuin.srcmixins4j.core.SrcMixin4JUtils.TypeParam2Type;
+import org.fuin.srcmixins4j.core.SrcMixins4JUtils.TypeParam2Type;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Test for the {@link SrcMixin4JUtils} class.
+ * Test for the {@link SrcMixins4JUtils} class.
  */
 // CHECKSTYLE:OFF
-public final class SrcMixin4JUtilsTest {
+public final class SrcMixins4JUtilsTest {
 
     private static File RES_DIR = new File("src/test/resources");
 
@@ -182,7 +182,7 @@ public final class SrcMixin4JUtilsTest {
             throws IOException {
 
         final Resource resource = loadResource(file);
-        final CompilationUnit compilationUnit = SrcMixin4JUtils
+        final CompilationUnit compilationUnit = SrcMixins4JUtils
                 .getCompilationUnit(resource);
         assertThat(compilationUnit).isNotNull();
         assertThat(compilationUnit.getClassifiers()).hasSize(1);
@@ -193,12 +193,12 @@ public final class SrcMixin4JUtilsTest {
     public final void testGetMixinInterfaces() {
 
         // TEST
-        final List<Interface> intfs = SrcMixin4JUtils
+        final List<Interface> intfs = SrcMixins4JUtils
                 .getMixinInterfaces(testMixinUserClassifier);
 
         // VERIFY
         assertThat(intfs).hasSize(1);
-        assertThat(SrcMixin4JUtils.getFullQualifiedName(intfs.get(0))).isEqualTo(
+        assertThat(SrcMixins4JUtils.getFullQualifiedName(intfs.get(0))).isEqualTo(
                 "a.b.c.TestMixinIntf");
 
     }
@@ -207,12 +207,12 @@ public final class SrcMixin4JUtilsTest {
     public final void testGetAnnotationInstance() {
 
         // TEST
-        final AnnotationInstance ai = SrcMixin4JUtils.getAnnotationInstance(
+        final AnnotationInstance ai = SrcMixins4JUtils.getAnnotationInstance(
                 testMixinProviderClassifier, MixinProvider.class.getName());
 
         // VERIFY
         assertThat(ai).isNotNull();
-        assertThat(SrcMixin4JUtils.getFullQualifiedName(ai.getAnnotation()))
+        assertThat(SrcMixins4JUtils.getFullQualifiedName(ai.getAnnotation()))
                 .isEqualTo(MixinProvider.class.getName());
 
     }
@@ -221,16 +221,16 @@ public final class SrcMixin4JUtilsTest {
     public final void testGetSingleAnnotationInterfaceParameter() {
 
         // PREPARE
-        final AnnotationInstance ai = SrcMixin4JUtils.getAnnotationInstance(
+        final AnnotationInstance ai = SrcMixins4JUtils.getAnnotationInstance(
                 testMixinProviderClassifier, MixinProvider.class.getName());
 
         // TEST
-        final Interface intf = SrcMixin4JUtils
+        final Interface intf = SrcMixins4JUtils
                 .getSingleAnnotationInterfaceParameter(ai);
 
         // VERIFY
         assertThat(intf).isNotNull();
-        assertThat(SrcMixin4JUtils.getFullQualifiedName(intf)).isEqualTo(
+        assertThat(SrcMixins4JUtils.getFullQualifiedName(intf)).isEqualTo(
                 "a.b.c.TestMixinIntf");
 
     }
@@ -239,12 +239,12 @@ public final class SrcMixin4JUtilsTest {
     public final void testGetMixinInterface() {
 
         // TEST
-        final Interface intf = SrcMixin4JUtils
+        final Interface intf = SrcMixins4JUtils
                 .getMixinInterface(testMixinProviderClassifier);
 
         // VERIFY
         assertThat(intf).isNotNull();
-        assertThat(SrcMixin4JUtils.getFullQualifiedName(intf)).isEqualTo(
+        assertThat(SrcMixins4JUtils.getFullQualifiedName(intf)).isEqualTo(
                 "a.b.c.TestMixinIntf");
 
     }
@@ -257,18 +257,18 @@ public final class SrcMixin4JUtilsTest {
                 .getConcreteClassifier(MixinGenerated.class.getName());
         final CompilationUnit cu = testMixinUserClassifier
                 .getContainingCompilationUnit();
-        assertThat(SrcMixin4JUtils.containsClassifierImport(cu, annotation))
+        assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isFalse();
         assertThat(testMixinUserClassifier.getFields()).isEmpty();
         assertThat(testMixinUserClassifier.getMethods()).hasSize(1);
 
         // TEST APPLY
-        SrcMixin4JUtils.applyMixin(testMixinUserClassifier,
+        SrcMixins4JUtils.applyMixin(testMixinUserClassifier,
                 testMixinProviderClassifier, testMixinIntfClassifier);
 
         // VERIFY APPLY
 
-        assertThat(SrcMixin4JUtils.containsClassifierImport(cu, annotation))
+        assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isTrue();
         assertThat(testMixinUserClassifier.getFields()).hasSize(1);
         assertThat(testMixinUserClassifier.getFields().get(0).getName())
@@ -280,13 +280,13 @@ public final class SrcMixin4JUtilsTest {
         assertThat(getXyzMethod.getName()).isEqualTo("getXyz");
         assertThat(getXyzMethod.getTypeReference()).isNotNull();
         assertThat(getXyzMethod.getTypeReference().getTarget()).isInstanceOf(Classifier.class);
-        assertThat(SrcMixin4JUtils.getFullQualifiedName((Classifier)getXyzMethod.getTypeReference().getTarget())).isEqualTo(String.class.getName());
+        assertThat(SrcMixins4JUtils.getFullQualifiedName((Classifier)getXyzMethod.getTypeReference().getTarget())).isEqualTo(String.class.getName());
 
         // TEST REMOVE
-        SrcMixin4JUtils.removeAllMixinMembers(testMixinUserClassifier);
+        SrcMixins4JUtils.removeAllMixinMembers(testMixinUserClassifier);
 
         // VERIFY REMOVE
-        assertThat(SrcMixin4JUtils.containsClassifierImport(cu, annotation))
+        assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isFalse();
         assertThat(testMixinUserClassifier.getFields()).isEmpty();
         assertThat(testMixinUserClassifier.getMethods()).hasSize(1);
@@ -301,7 +301,7 @@ public final class SrcMixin4JUtilsTest {
         final Field field = memberContainer.getFields().get(0);
         assertThat(field.getName()).isEqualTo(fieldName);
         assertThat(
-                SrcMixin4JUtils.getAnnotationInstance(field,
+                SrcMixins4JUtils.getAnnotationInstance(field,
                         MixinGenerated.class.getName())).isNull();
     }
 
@@ -311,7 +311,7 @@ public final class SrcMixin4JUtilsTest {
         final Method method = memberContainer.getMethods().get(0);
         assertThat(method.getName()).isEqualTo(methodName);
         assertThat(
-                SrcMixin4JUtils.getAnnotationInstance(method,
+                SrcMixins4JUtils.getAnnotationInstance(method,
                         MixinGenerated.class.getName())).isNull();
     }
 
@@ -324,7 +324,7 @@ public final class SrcMixin4JUtilsTest {
         final CompilationUnit cu = testMixinUser2Classifier
                 .getContainingCompilationUnit();
 
-        assertThat(SrcMixin4JUtils.containsClassifierImport(cu, annotation))
+        assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isFalse();
         assertHasFieldWithoutMixinGeneratedAnnotation(testMixinUser2Classifier,
                 "xyz");
@@ -332,11 +332,11 @@ public final class SrcMixin4JUtilsTest {
                 testMixinUser2Classifier, "getXyz");
 
         // TEST APPLY
-        SrcMixin4JUtils.applyMixin(testMixinUser2Classifier,
+        SrcMixins4JUtils.applyMixin(testMixinUser2Classifier,
                 testMixinProviderClassifier, testMixinIntfClassifier);
 
         // VERIFY nothing changed
-        assertThat(SrcMixin4JUtils.containsClassifierImport(cu, annotation))
+        assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isFalse();
         assertHasFieldWithoutMixinGeneratedAnnotation(testMixinUser2Classifier,
                 "xyz");
@@ -344,10 +344,10 @@ public final class SrcMixin4JUtilsTest {
                 testMixinUser2Classifier, "getXyz");
 
         // TEST REMOVE
-        SrcMixin4JUtils.removeAllMixinMembers(testMixinUser2Classifier);
+        SrcMixins4JUtils.removeAllMixinMembers(testMixinUser2Classifier);
 
         // VERIFY nothing changed
-        assertThat(SrcMixin4JUtils.containsClassifierImport(cu, annotation))
+        assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isFalse();
         assertHasFieldWithoutMixinGeneratedAnnotation(testMixinUser2Classifier,
                 "xyz");
@@ -366,11 +366,11 @@ public final class SrcMixin4JUtilsTest {
         assertThat(concreteClassifier.eIsProxy()).isFalse();
 
         final Resource resource = loadResource(TEST_MIXIN_PROVIDER);
-        final CompilationUnit compilationUnit = SrcMixin4JUtils
+        final CompilationUnit compilationUnit = SrcMixins4JUtils
                 .getCompilationUnit(resource);
 
         // TEST
-        assertThat(SrcMixin4JUtils.containsClassifierImport(compilationUnit,
+        assertThat(SrcMixins4JUtils.containsClassifierImport(compilationUnit,
                 concreteClassifier));
 
     }
@@ -383,22 +383,22 @@ public final class SrcMixin4JUtilsTest {
         assertThat(stringClass).isNotNull();
         assertThat(stringClass.eIsProxy()).isFalse();
         final Resource resource = loadResource(TEST_INTF);
-        final CompilationUnit compilationUnit = SrcMixin4JUtils
+        final CompilationUnit compilationUnit = SrcMixins4JUtils
                 .getCompilationUnit(resource);
         assertThat(
-                SrcMixin4JUtils.containsClassifierImport(compilationUnit,
+                SrcMixins4JUtils.containsClassifierImport(compilationUnit,
                         stringClass)).isFalse();
 
         // TEST ADD
-        SrcMixin4JUtils.addClassifierImport(compilationUnit, stringClass);
+        SrcMixins4JUtils.addClassifierImport(compilationUnit, stringClass);
         assertThat(
-                SrcMixin4JUtils.containsClassifierImport(compilationUnit,
+                SrcMixins4JUtils.containsClassifierImport(compilationUnit,
                         stringClass)).isTrue();
 
         // TEST REMOVE
-        SrcMixin4JUtils.removeClassifierImport(compilationUnit, stringClass);
+        SrcMixins4JUtils.removeClassifierImport(compilationUnit, stringClass);
         assertThat(
-                SrcMixin4JUtils.containsClassifierImport(compilationUnit,
+                SrcMixins4JUtils.containsClassifierImport(compilationUnit,
                         stringClass)).isFalse();
 
     }
@@ -407,7 +407,7 @@ public final class SrcMixin4JUtilsTest {
     public final void testGetFullQualifiedName() throws IOException {
 
         assertThat(
-                SrcMixin4JUtils.getFullQualifiedName(testMixinProviderClassifier))
+                SrcMixins4JUtils.getFullQualifiedName(testMixinProviderClassifier))
                 .isEqualTo("a.b.c.TestMixinProvider");
 
     }
@@ -423,10 +423,10 @@ public final class SrcMixin4JUtilsTest {
 
         // TEST
         assertThat(
-                SrcMixin4JUtils.findMethodBySignature(testClassA, "methodA",
+                SrcMixins4JUtils.findMethodBySignature(testClassA, "methodA",
                         methodB.getParameters())).isSameAs(methodA);
         assertThat(
-                SrcMixin4JUtils.findMethodBySignature(testClassA, "methodB",
+                SrcMixins4JUtils.findMethodBySignature(testClassA, "methodB",
                         methodA.getParameters())).isSameAs(methodB);
 
     }
@@ -451,16 +451,16 @@ public final class SrcMixin4JUtilsTest {
 
         // TEST
         assertThat(
-                SrcMixin4JUtils.sameParameters(methodA.getParameters(),
+                SrcMixins4JUtils.sameParameters(methodA.getParameters(),
                         methodB.getParameters())).isTrue();
         assertThat(
-                SrcMixin4JUtils.sameParameters(methodA.getParameters(),
+                SrcMixins4JUtils.sameParameters(methodA.getParameters(),
                         methodC.getParameters())).isFalse();
         assertThat(
-                SrcMixin4JUtils.sameParameters(methodA.getParameters(),
+                SrcMixins4JUtils.sameParameters(methodA.getParameters(),
                         methodD.getParameters())).isFalse();
         assertThat(
-                SrcMixin4JUtils.sameParameters(methodC.getParameters(),
+                SrcMixins4JUtils.sameParameters(methodC.getParameters(),
                         methodD.getParameters())).isFalse();
 
     }
@@ -498,22 +498,22 @@ public final class SrcMixin4JUtilsTest {
         for (int i = 0; i < typesA.length; i++) {
             for (int j = 0; j < typesA.length; j++) {
                 if (i == j) {
-                    assertThat(SrcMixin4JUtils.sameType(typesA[i], typesA[j]))
+                    assertThat(SrcMixins4JUtils.sameType(typesA[i], typesA[j]))
                             .isTrue();
-                    assertThat(SrcMixin4JUtils.sameType(typesB[i], typesB[j]))
+                    assertThat(SrcMixins4JUtils.sameType(typesB[i], typesB[j]))
                             .isTrue();
-                    assertThat(SrcMixin4JUtils.sameType(typesA[i], typesB[j]))
+                    assertThat(SrcMixins4JUtils.sameType(typesA[i], typesB[j]))
                             .isTrue();
-                    assertThat(SrcMixin4JUtils.sameType(typesB[i], typesA[j]))
+                    assertThat(SrcMixins4JUtils.sameType(typesB[i], typesA[j]))
                             .isTrue();
                 } else {
-                    assertThat(SrcMixin4JUtils.sameType(typesA[i], typesA[j]))
+                    assertThat(SrcMixins4JUtils.sameType(typesA[i], typesA[j]))
                             .isFalse();
-                    assertThat(SrcMixin4JUtils.sameType(typesB[i], typesB[j]))
+                    assertThat(SrcMixins4JUtils.sameType(typesB[i], typesB[j]))
                             .isFalse();
-                    assertThat(SrcMixin4JUtils.sameType(typesA[i], typesB[j]))
+                    assertThat(SrcMixins4JUtils.sameType(typesA[i], typesB[j]))
                             .isFalse();
-                    assertThat(SrcMixin4JUtils.sameType(typesB[i], typesA[j]))
+                    assertThat(SrcMixins4JUtils.sameType(typesB[i], typesA[j]))
                             .isFalse();
                 }
             }
@@ -525,7 +525,7 @@ public final class SrcMixin4JUtilsTest {
     public void testCreateTypeParam2ArgMapping() {
 
         // TEST
-        final List<TypeParam2Type> typeParam2ArgList = SrcMixin4JUtils
+        final List<TypeParam2Type> typeParam2ArgList = SrcMixins4JUtils
                 .createTypeParam2ArgMapping(testGenericMixinIntfClassifier,
                         testGenericMixinUserClassifier);
 
@@ -544,7 +544,7 @@ public final class SrcMixin4JUtilsTest {
         assertThat(typeParam2ArgList.get(1).getArgType()).isInstanceOf(
                 Class.class);
         final Class clasz = (Class) typeParam2ArgList.get(1).getArgType();
-        assertThat(SrcMixin4JUtils.getFullQualifiedName(clasz)).isEqualTo(
+        assertThat(SrcMixins4JUtils.getFullQualifiedName(clasz)).isEqualTo(
                 ArrayList.class.getName());
 
     }
@@ -553,7 +553,7 @@ public final class SrcMixin4JUtilsTest {
     public void testReplaceGenericsChanged() throws IOException {
 
         // PREPARE
-        final List<TypeParam2Type> typeParam2ArgList = SrcMixin4JUtils
+        final List<TypeParam2Type> typeParam2ArgList = SrcMixins4JUtils
                 .createTypeParam2ArgMapping(testGenericMixinIntfClassifier,
                         testGenericMixinUserClassifier);
 
@@ -562,7 +562,7 @@ public final class SrcMixin4JUtilsTest {
         final Method addB = EcoreUtil.copy((Method) addBMembers.get(0));
 
         // TEST
-        SrcMixin4JUtils.replaceGenerics(addB, typeParam2ArgList);
+        SrcMixins4JUtils.replaceGenerics(addB, typeParam2ArgList);
 
         // VERIFY
         assertThat(addB.getName()).isEqualTo("add");
@@ -582,7 +582,7 @@ public final class SrcMixin4JUtilsTest {
     public void testReplaceGenericsUnchanged() {
 
         // PREPARE
-        final List<TypeParam2Type> typeParam2ArgList = SrcMixin4JUtils
+        final List<TypeParam2Type> typeParam2ArgList = SrcMixins4JUtils
                 .createTypeParam2ArgMapping(testGenericMixinIntfClassifier,
                         testGenericMixinUserClassifier);
 
@@ -591,7 +591,7 @@ public final class SrcMixin4JUtilsTest {
         final Method getA = EcoreUtil.copy((Method) getAMembers.get(0));
 
         // TEST
-        SrcMixin4JUtils.replaceGenerics(getA, typeParam2ArgList);
+        SrcMixins4JUtils.replaceGenerics(getA, typeParam2ArgList);
 
         // VERIFY
         assertThat(getA.getName()).isEqualTo("getA");
@@ -609,16 +609,16 @@ public final class SrcMixin4JUtilsTest {
     public void testFindMapping() {
 
         // PREPARE
-        final List<TypeParam2Type> typeParam2ArgList = SrcMixin4JUtils
+        final List<TypeParam2Type> typeParam2ArgList = SrcMixins4JUtils
                 .createTypeParam2ArgMapping(testGenericMixinIntfClassifier,
                         testGenericMixinUserClassifier);
 
         // TEST
-        assertThat(SrcMixin4JUtils.findMapping("A", typeParam2ArgList))
+        assertThat(SrcMixins4JUtils.findMapping("A", typeParam2ArgList))
                 .isNotNull();
-        assertThat(SrcMixin4JUtils.findMapping("B", typeParam2ArgList))
+        assertThat(SrcMixins4JUtils.findMapping("B", typeParam2ArgList))
                 .isNotNull();
-        assertThat(SrcMixin4JUtils.findMapping("C", typeParam2ArgList)).isNull();
+        assertThat(SrcMixins4JUtils.findMapping("C", typeParam2ArgList)).isNull();
 
     }
 
@@ -630,12 +630,12 @@ public final class SrcMixin4JUtilsTest {
                 .getConcreteClassifier(MixinGenerated.class.getName());
         final CompilationUnit cu = testGenericMixinUserClassifier
                 .getContainingCompilationUnit();
-        assertThat(SrcMixin4JUtils.containsClassifierImport(cu, annotation))
+        assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isFalse();
         assertThat(testGenericMixinUserClassifier.getFields()).isEmpty();
         assertThat(testGenericMixinUserClassifier.getMethods()).isEmpty();
 
-        SrcMixin4JUtils.applyMixin(testGenericMixinUserClassifier,
+        SrcMixins4JUtils.applyMixin(testGenericMixinUserClassifier,
                 testGenericMixinProviderClassifier,
                 testGenericMixinIntfClassifier);
 

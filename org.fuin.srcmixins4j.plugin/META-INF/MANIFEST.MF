@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui,
  org.emftext.language.java,
  org.emftext.language.java.resource,
  org.emftext.language.java.resource.java
-Bundle-Activator: org.fuin.srcmixins4j.plugin.SrcMixin4JPlugin
+Bundle-Activator: org.fuin.srcmixins4j.plugin.SrcMixins4JPlugin
 Import-Package: org.fuin.srcmixins4j.annotations,
  org.fuin.srcmixins4j.core
 Export-Package: org.fuin.srcmixins4j.plugin
