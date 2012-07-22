@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SrcMixins4J Plugin
+Bundle-SymbolicName: org.fuin.srcmixins4j.plugin;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Vendor: Future Invent Informationsmanagement GmbH - Hamburg (Germany)
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ org.eclipse.emf.ecore,
+ org.emftext.language.java,
+ org.emftext.language.java.resource,
+ org.emftext.language.java.resource.java
+Bundle-Activator: org.fuin.srcmixins4j.plugin.SrcMixin4JPlugin
+Import-Package: org.fuin.srcmixins4j.annotations,
+ org.fuin.srcmixins4j.core
+Export-Package: org.fuin.srcmixins4j.plugin
+Bundle-ActivationPolicy: lazy

@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1342950785317
+Build-Jdk: 1.6.0_16
+Built-By: michael-schnell
+Bundle-ActivationPolicy: lazy
+Bundle-DocURL: http://www.fuin.org
+Bundle-License: http://www.fsf.org/licensing/licenses/lgpl.html
+Bundle-ManifestVersion: 2
+Bundle-Name: Mixin4J Core
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: mixins4j-core
+Bundle-Vendor: Future Invent Informationsmanagement GmbH - Hamburg (Germ
+ any)
+Bundle-Version: 0.1.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: org.fuin.srcmixins4j.core
+Import-Package: org.fuin.srcmixins4j.annotations
+Originally-Created-By: Maven Integration for Eclipse
+Require-Bundle: org.eclipse.emf.ecore,org.emftext.language.java,org.emft
+ ext.language.java.resource,org.emftext.language.java.resource.java
+Tool: Bnd-1.50.0
