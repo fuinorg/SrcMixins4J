@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SrcMixins4J Plugin
 Bundle-SymbolicName: org.fuin.srcmixins4j.plugin;singleton:=true
-Bundle-Version: 0.1.0.SNAPSHOT
+Bundle-Version: 0.1.0
 Bundle-Vendor: Future Invent Informationsmanagement GmbH - Hamburg (Germany)
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.ui,
