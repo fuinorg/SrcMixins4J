@@ -1,91 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <prerequisites>
-        <maven>3.0</maven>
-    </prerequisites>
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
 
-    <groupId>org.fuin.srcmixins4j</groupId>
-    <artifactId>srcmixins4j-parent</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>SrcMixins4J Parent</name>
-    <description>Source code based mixins for Java</description>
+	<groupId>org.fuin.srcmixins4j</groupId>
+	<artifactId>srcmixins4j-parent</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>SrcMixins4J Parent</name>
+	<description>Source code based mixins for Java</description>
 
-    <licenses>
-        <license>
-            <name>LGPL</name>
-            <url>http://www.fsf.org/licensing/licenses/lgpl.html</url>
-            <distribution>repo</distribution>
-            <comments>GNU Lesser General Public License</comments>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>LGPL</name>
+			<url>http://www.fsf.org/licensing/licenses/lgpl.html</url>
+			<distribution>repo</distribution>
+			<comments>GNU Lesser General Public License</comments>
+		</license>
+	</licenses>
 
-    <organization>
-        <name>Future Invent Informationsmanagement GmbH - Hamburg (Germany)</name>
-        <url>http://www.fuin.org</url>
-    </organization>
+	<organization>
+		<name>Future Invent Informationsmanagement GmbH - Hamburg (Germany)</name>
+		<url>http://www.fuin.org</url>
+	</organization>
 
-    <developers>    
-        <developer>
-            <id>michael-schnell</id>
-            <name>Michael Schnell</name>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
-    
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tycho-version>0.15.0</tycho-version>
-        <manifest-location>META-INF</manifest-location>
-    </properties>
+	<developers>
+		<developer>
+			<id>michael-schnell</id>
+			<name>Michael Schnell</name>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
 
-    <modules>
-        <module>srcmixins4j-annotations</module>
-        <module>srcmixins4j-core</module>
-    </modules>
-    
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tycho-version>0.15.0</tycho-version>
+		<manifest-location>META-INF</manifest-location>
+	</properties>
 
-    <build>
+	<distributionManagement>
+		<repository>
+			<id>fuin-local-repository</id>
+			<url>file:/${org.fuin.local.repository}</url>
+		</repository>
+	</distributionManagement>
 
-        <plugins>
+	<modules>
+		<module>srcmixins4j-annotations</module>
+		<module>srcmixins4j-core</module>
+	</modules>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
 
-        </plugins>
+	<build>
 
-    </build>
+		<plugins>
 
-    <repositories>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
 
-        <repository>        
-            <id>mvn.emftext.org</id>
-            <url>http://emftext.org/maven-repository/</url>
-        </repository>
+		</plugins>
 
-        <repository>
-            <id>eclipse-indigo</id>
-            <layout>p2</layout>
-            <url>http://download.eclipse.org/releases/indigo</url>
-        </repository>
-        
-        <repository>
-            <id>p2.emftext.org</id>
-            <layout>p2</layout>
-            <url>http://emftext.org/update_trunk</url>
-        </repository>       
+	</build>
 
-    </repositories>
-    
+	<repositories>
+
+		<repository>
+			<id>mvn.emftext.org</id>
+			<url>http://emftext.org/maven-repository/</url>
+		</repository>
+
+		<repository>
+			<id>eclipse-indigo</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/indigo</url>
+		</repository>
+
+		<repository>
+			<id>p2.emftext.org</id>
+			<layout>p2</layout>
+			<url>http://emftext.org/update_trunk</url>
+		</repository>
+
+		<repository>
+			<id>fuin.org</id>
+			<name>Repository at fuin.org</name>
+			<url>http://www.fuin.org/maven-repository</url>
+		</repository>
+
+	</repositories>
+
 </project>
