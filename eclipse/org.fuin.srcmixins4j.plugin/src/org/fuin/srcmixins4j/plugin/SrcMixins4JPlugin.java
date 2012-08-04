@@ -21,7 +21,11 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.jdt.core.ElementChangedEvent;
+import org.eclipse.jdt.core.IElementChangedListener;
+import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.emftext.language.java.JavaClasspath;
 import org.emftext.language.java.resource.java.IJavaOptions;
 import org.osgi.framework.BundleContext;
@@ -35,17 +39,31 @@ public final class SrcMixins4JPlugin extends Plugin {
 
     private ResourceSet resourceSet = null;
 
+    private IElementChangedListener cpChangeListener;
+    
     private IJavaProject currentProject = null;
 
     @Override
     public final void start(final BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
+        cpChangeListener = new IElementChangedListener() {
+            @Override
+            public void elementChanged(final ElementChangedEvent event) {
+                final IJavaElementDelta delta = event.getDelta();
+                if ((delta.getFlags() & IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED) != 0) { 
+                    resetClasspath();
+                }
+            }        
+        };
+        JavaCore.addElementChangedListener(cpChangeListener);
     }
 
     @Override
     public final void stop(final BundleContext context) throws Exception {
+        JavaCore.removeElementChangedListener(cpChangeListener);
         plugin = null;
+        cpChangeListener = null;
         super.stop(context);
     }
 
