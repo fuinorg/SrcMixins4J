@@ -890,15 +890,19 @@ public final class SrcMixins4JUtils {
      * @param userMixinsMap
      *            Map from mixin user to provider/interfaces.
      * 
+     * @return List of changed mixin user classes.
+     * 
      * @throws IOException
      *             Error saving the changes.
      */
-    public static void applyMixins(final ResourceSet resourceSet,
+    public static List<Class> applyMixins(final ResourceSet resourceSet,
             final Map<Class, List<MixinInfo>> userMixinsMap) throws IOException {
 
         assertArgNotNull("resourceSet", resourceSet);
         assertArgNotNull("userMixinsMap", userMixinsMap);
 
+        final List<Class> mixinUsers = new ArrayList<Class>();
+        
         final Iterator<Class> it = userMixinsMap.keySet().iterator();
         while (it.hasNext()) {
             final Class mixinUserClass = it.next();
@@ -910,7 +914,10 @@ public final class SrcMixins4JUtils {
                         info.getInterface());
             }
             saveToFile(mixinUserClass);
+            mixinUsers.add(mixinUserClass);
         }
+        
+        return mixinUsers;
     }
 
     /**
@@ -919,15 +926,17 @@ public final class SrcMixins4JUtils {
      * @param resourceSet
      *            Resource set to inspect and update.
      * 
+     * @return List of changed mixin user classes.
+     * 
      * @throws IOException
      *             Error saving the changed mixin user classes.
      */
-    public static void applyMixins(final ResourceSet resourceSet)
+    public static List<Class> applyMixins(final ResourceSet resourceSet)
             throws IOException {
 
         assertArgNotNull("resourceSet", resourceSet);
 
-        applyMixins(resourceSet, createUserMixinsMap(resourceSet));
+        return applyMixins(resourceSet, createUserMixinsMap(resourceSet));
 
     }
 
