@@ -148,14 +148,6 @@ public final class SrcMixins4JUtilsTest {
         resourceSet = null;
     }
 
-    private void loadResources(final ResourceSet set, final File dir) throws IOException {
-        final File[] files = dir.listFiles();
-        for (final File file : files) {
-            if (file.isFile()) {
-                loadResource(set, file);
-            }
-        }
-    }
     
     private static ResourceSet createResourceSet(final File dir)
             throws IOException {
@@ -749,7 +741,7 @@ public final class SrcMixins4JUtilsTest {
         FileUtils.copyFile(TEST_MIXIN_USER3, testMixinUser3File);
 
         final ResourceSet set = createResourceSet(tmpSrcDir);
-        loadResources(set, tmpSrcDir);
+        SrcMixins4JUtils.loadResources(set, tmpSrcDir);
 
         // TEST
         SrcMixins4JUtils.applyMixins(set);

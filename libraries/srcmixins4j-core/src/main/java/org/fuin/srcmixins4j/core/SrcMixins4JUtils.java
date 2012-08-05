@@ -17,6 +17,7 @@
  */
 package org.fuin.srcmixins4j.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.Map;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -1097,4 +1099,23 @@ public final class SrcMixins4JUtils {
 
     }
 
+    /**
+     * Loads all resources in a directory and it's sub directories.
+     * 
+     * @param resourceSet Resource set to use.
+     * @param dir Directory to parse.
+     * 
+     * @throws IOException Error parsing the resources.
+     */
+    public static void loadResources(final ResourceSet resourceSet, final File dir) throws IOException {
+        final File[] files = dir.listFiles();
+        for (final File file : files) {
+            if (file.isFile()) {
+                resourceSet.getResource(URI.createFileURI(file.getCanonicalPath()), true);
+            } else {
+                loadResources(resourceSet, file);
+            }
+        }
+    }
+    
 }
