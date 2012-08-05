@@ -15,12 +15,11 @@
 
         <!-- compile -->
 
-        <dependency>
-            <groupId>org.fuin.srcmixins4j</groupId>
-            <artifactId>srcmixins4j-maven-plugin</artifactId>
-            <version>0.2.0</version>
-        </dependency>
-
+		<dependency>
+			<groupId>org.fuin.srcmixins4j</groupId>
+			<artifactId>srcmixins4j-annotations</artifactId>
+			<version>0.2.0</version>
+		</dependency>
 
         <!-- test -->
 
@@ -50,14 +49,14 @@
                                     <pluginExecutionFilter>
                                         <groupId>org.fuin.srcmixins4j</groupId>
                                         <artifactId>srcmixins4j-maven-plugin</artifactId>
-                                        <versionRange>[0.1.0,)</versionRange>
-                                        <goals>
+                                        <versionRange>[0.1.0,)</versionRange>                                        
+                                        <goals>                                        
                                             <goal>process-template</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
                                         <execute>
-                                            <runOnIncremental>false</runOnIncremental>
+                                            <runOnIncremental>true</runOnIncremental>
                                         </execute>
                                     </action>
                                 </pluginExecution>
