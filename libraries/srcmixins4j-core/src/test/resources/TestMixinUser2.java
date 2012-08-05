@@ -1,6 +1,6 @@
 package a.b.c;
 
-public class TestMixinUser implements TestMixinIntf {
+public class TestMixinUser2 implements TestMixinIntf {
 
     // This field is normally provided by the mixin, 
     // but explicitly "overridden" by this class

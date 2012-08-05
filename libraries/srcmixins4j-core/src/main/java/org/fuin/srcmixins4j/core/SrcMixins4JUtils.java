@@ -81,10 +81,10 @@ public final class SrcMixins4JUtils {
 
     /**
      * Returns a list of all Mixin interfaces implemented by a given class.
-     *
+     * 
      * @param clasz
      *            Class to inspect.
-     *
+     * 
      * @return List of interfaces the inspected class implements.
      */
     public static List<Interface> getMixinInterfaces(final Class clasz) {
@@ -113,12 +113,12 @@ public final class SrcMixins4JUtils {
     /**
      * Returns an annotation instance by the full qualified name of the
      * annotation.
-     *
+     * 
      * @param annotable
      *            Annotated element.
      * @param fullQualifiedName
      *            Full qualified name of the annotation class to find.
-     *
+     * 
      * @return Instance or <code>null</code> if the annotation was not found.
      */
     public static AnnotationInstance getAnnotationInstance(
@@ -155,10 +155,10 @@ public final class SrcMixins4JUtils {
     /**
      * Returns the "value()" from an annotation that has only a single parameter
      * of type annotation.
-     *
+     * 
      * @param annotationInstance
      *            Annotation instance to return the value from.
-     *
+     * 
      * @return Interface.
      */
     public static Interface getSingleAnnotationInterfaceParameter(
@@ -186,10 +186,10 @@ public final class SrcMixins4JUtils {
      * Returns the mixin interface that a mixin provider class implements.
      * Inspects the {@link MixinProvider} annotation and returns the value
      * parameter from it.
-     *
+     * 
      * @param mixinProviderClass
      *            Class that provides the mixin.
-     *
+     * 
      * @return Mixin interface or <code>null</code> if the given class has no
      *         appropriate annotation or an incorrect value.
      */
@@ -211,7 +211,7 @@ public final class SrcMixins4JUtils {
     /**
      * Removes all fields and methods annotated with {@link MixinGenerated} from
      * the given class.
-     *
+     * 
      * @param mixinUserClass
      *            Class to remove the mixin code from.
      */
@@ -243,7 +243,7 @@ public final class SrcMixins4JUtils {
 
     /**
      * Adds mixin code to the given class.
-     *
+     * 
      * @param mixinUser
      *            Class to add the mixin code to.
      * @param mixinProvider
@@ -261,33 +261,17 @@ public final class SrcMixins4JUtils {
         assertNoProxy(mixinProvider);
         assertNoProxy(mixinInterface);
 
-        final List<Field> fieldsToAdd = new ArrayList<Field>();
-        final List<Field> providerFields = mixinProvider.getFields();
-        for (final Field field : providerFields) {
-            if (findFieldByName(mixinUser, field.getName()) == null) {
-                fieldsToAdd.add(field);
-            }
-        }
+        final List<Field> fieldsToAdd = createListOfFieldsToAdd(mixinUser,
+                mixinProvider);
 
-        final List<Method> methodsToAdd = new ArrayList<Method>();
-        final List<Method> providerMethods = mixinProvider.getMethods();
-        for (final Method method : providerMethods) {
-
-            final boolean userHasAlreadySameMethod = findMethodBySignature(
-                    mixinUser, method.getName(), method.getParameters()) != null;
-            final boolean methodHasMixinGeneratedAnnotation = getAnnotationInstance(method,
-                            MixinGenerated.class.getName()) != null;
-
-            if (methodHasMixinGeneratedAnnotation && !userHasAlreadySameMethod) {
-                methodsToAdd.add(method);
-            }
-
-        }
+        final List<Method> methodsToAdd = createListOfMethodsToAdd(mixinUser,
+                mixinProvider);
 
         if ((fieldsToAdd.size() > 0) || (methodsToAdd.size() > 0)) {
 
             // Create mapping for generic type parameters
-            final List<TypeParam2Type> typeParam2ArgList = createTypeParam2ArgMapping(mixinInterface, mixinUser);
+            final List<TypeParam2Type> typeParam2ArgList = createTypeParam2ArgMapping(
+                    mixinInterface, mixinUser);
 
             // Add import
             addClassifierImport(mixinUser.getContainingCompilationUnit(),
@@ -322,15 +306,80 @@ public final class SrcMixins4JUtils {
     }
 
     /**
+     * Creates a list of fields to add by comparing the fields of the provider
+     * and the fields in the mixin user class.
+     * 
+     * @param mixinUser
+     *            User to add fields to.
+     * @param mixinProvider
+     *            Provider with fields to copy.
+     * 
+     * @return List of fields that are in the provider but not in the user
+     *         class.
+     */
+    private static List<Field> createListOfFieldsToAdd(final Class mixinUser,
+            final Class mixinProvider) {
+
+        final List<Field> fieldsToAdd = new ArrayList<Field>();
+        final List<Field> providerFields = mixinProvider.getFields();
+        for (final Field field : providerFields) {
+
+            final boolean userHasAlreadySameField = findFieldByName(mixinUser,
+                    field.getName()) != null;
+            final boolean fieldHasMixinGeneratedAnnotation = getAnnotationInstance(
+                    field, MixinGenerated.class.getName()) != null;
+
+            if (fieldHasMixinGeneratedAnnotation && !userHasAlreadySameField) {
+                fieldsToAdd.add(field);
+            }
+        }
+        return fieldsToAdd;
+
+    }
+
+    /**
+     * Creates a list of methods to add by comparing the methods of the provider
+     * and the methods in the mixin user class.
+     * 
+     * @param mixinUser
+     *            User to add methods to.
+     * @param mixinProvider
+     *            Provider with methods to copy.
+     * 
+     * @return List of methods that are in the provider but not in the user
+     *         class.
+     */
+    private static List<Method> createListOfMethodsToAdd(final Class mixinUser,
+            final Class mixinProvider) {
+
+        final List<Method> methodsToAdd = new ArrayList<Method>();
+        final List<Method> providerMethods = mixinProvider.getMethods();
+        for (final Method method : providerMethods) {
+
+            final boolean userHasAlreadySameMethod = findMethodBySignature(
+                    mixinUser, method.getName(), method.getParameters()) != null;
+            final boolean methodHasMixinGeneratedAnnotation = getAnnotationInstance(
+                    method, MixinGenerated.class.getName()) != null;
+
+            if (methodHasMixinGeneratedAnnotation && !userHasAlreadySameMethod) {
+                methodsToAdd.add(method);
+            }
+
+        }
+        return methodsToAdd;
+
+    }
+
+    /**
      * Returns a method by the signature of a given method.
-     *
+     * 
      * @param memberContainer
      *            Has list of methods.
      * @param methodName
      *            Name of the method to find.
      * @param params
      *            Parameter list.
-     *
+     * 
      * @return If a method with the same signature (name and parameter types)
      *         exists it's returned, else <code>null</code>.
      */
@@ -357,12 +406,12 @@ public final class SrcMixins4JUtils {
     /**
      * Checks if two parameter lists have the same number, order and types of
      * arguments. Parameter names are NOT checked (only types).
-     *
+     * 
      * @param paramsA
      *            First parameter list.
      * @param paramsB
      *            Second parameter list.
-     *
+     * 
      * @return If both arguments are the same TRUE, else FALSE.
      */
     public static boolean sameParameters(final List<Parameter> paramsA,
@@ -392,12 +441,12 @@ public final class SrcMixins4JUtils {
      * Checks if two types are the same. Classifiers and primitive types are
      * compared by their full qualified name. Anonymous classes by their equals
      * method.
-     *
+     * 
      * @param typeA
      *            First type.
      * @param typeB
      *            Second type.
-     *
+     * 
      * @return If both types are equal TRUE, else FALSE.
      */
     public static boolean sameType(final Type typeA, final Type typeB) {
@@ -436,12 +485,12 @@ public final class SrcMixins4JUtils {
 
     /**
      * Returns a field by it's name.
-     *
+     * 
      * @param memberContainer
      *            Has list of fields.
      * @param fieldName
      *            Name of the field to find.
-     *
+     * 
      * @return If a field with that name exists it's returned, else
      *         <code>null</code>.
      */
@@ -464,12 +513,12 @@ public final class SrcMixins4JUtils {
 
     /**
      * Checks if a classifier import already exists.
-     *
+     * 
      * @param importingElement
      *            Element to inspect.
      * @param concreteClassifier
      *            Import to find.
-     *
+     * 
      * @return If the import exists TRUE, else FALSE.
      */
     public static boolean containsClassifierImport(
@@ -499,7 +548,7 @@ public final class SrcMixins4JUtils {
 
     /**
      * Adds a classifier import to an element (if it not already exists).
-     *
+     * 
      * @param importingElement
      *            Element to add an import to.
      * @param concreteClassifier
@@ -529,7 +578,7 @@ public final class SrcMixins4JUtils {
 
     /**
      * Removes a classifier import from an element (if the import exists).
-     *
+     * 
      * @param importingElement
      *            Element to remove the import from.
      * @param concreteClassifier
@@ -564,10 +613,10 @@ public final class SrcMixins4JUtils {
 
     /**
      * Returns the package from the containing compilation unit and the name.
-     *
+     * 
      * @param classifier
      *            Classifier to return a FQN for.
-     *
+     * 
      * @return Full qualified name of the given classifier.
      */
     public static String getFullQualifiedName(final Classifier classifier) {
@@ -582,10 +631,10 @@ public final class SrcMixins4JUtils {
 
     /**
      * Returns the compilation unit from the resource.
-     *
+     * 
      * @param resource
      *            Resource.
-     *
+     * 
      * @return Compilation unit or <code>null</code> if the resource contains to
      *         compilation unit.
      */
@@ -606,12 +655,12 @@ public final class SrcMixins4JUtils {
     /**
      * Creates mapping of interface type parameters to type arguments in the
      * implementing class.
-     *
+     * 
      * @param mixinInterface
      *            Interface with type arguments.
      * @param mixinUserClass
      *            Class implementing the interface.
-     *
+     * 
      * @return List of mapped parameters.
      */
     public static List<TypeParam2Type> createTypeParam2ArgMapping(
@@ -664,7 +713,7 @@ public final class SrcMixins4JUtils {
     /**
      * Replaces all occurrences of all type parameters in the list in the given
      * object and it's children.
-     *
+     * 
      * @param eObj
      *            Object to replace type parameters within.
      * @param typeParam2ArgList
@@ -701,7 +750,8 @@ public final class SrcMixins4JUtils {
                             final EList<ClassifierReference> argClRefs = argNcr
                                     .getClassifierReferences();
                             for (final ClassifierReference argClRef : argClRefs) {
-                                final ClassifierReference newArgClRef = EcoreUtil.copy(argClRef);
+                                final ClassifierReference newArgClRef = EcoreUtil
+                                        .copy(argClRef);
                                 newArgClRef.getLayoutInformations().clear();
                                 newClRefs.add(newArgClRef);
                             }
@@ -721,12 +771,12 @@ public final class SrcMixins4JUtils {
 
     /**
      * Returns the mapping for a given parameter by it's name.
-     *
+     * 
      * @param typeParamName
      *            Name of the parameter to find.
      * @param list
      *            List with known mappings.
-     *
+     * 
      * @return Mapping element if the parameter was found, else NULL.
      */
     public static TypeParam2Type findMapping(final String typeParamName,
@@ -739,9 +789,15 @@ public final class SrcMixins4JUtils {
         return null;
     }
 
-    // TODO Cleanup
-    public static List<Class> findAllMixinProviderClasses(
-            final ResourceSet resourceSet) {
+    /**
+     * Find all classes that provide code for a mixin interface.
+     * 
+     * @param resourceSet
+     *            Resource set to use.
+     * 
+     * @return List of mixin providers.
+     */
+    public static List<Class> findMixinProviders(final ResourceSet resourceSet) {
 
         assertArgNotNull("resourceSet", resourceSet);
 
@@ -759,13 +815,22 @@ public final class SrcMixins4JUtils {
         return classes;
     }
 
-    // TODO Cleanup
-    public static List<Class> findAllClassesImplementingMixin(
-            final ResourceSet resourceSet, final Interface mixinInterface) {
+    /**
+     * Returns a list of all classes that directly implement an interface.
+     * 
+     * @param resourceSet
+     *            Resource set to use.
+     * @param intf
+     *            Interface to find the implementing classes for.
+     * 
+     * @return List of classes that implement the interface.
+     */
+    public static List<Class> findImplementors(final ResourceSet resourceSet,
+            final Interface intf) {
 
         assertArgNotNull("resourceSet", resourceSet);
-        assertArgNotNull("mixinInterface", mixinInterface);
-        assertNoProxy(mixinInterface);
+        assertArgNotNull("intf", intf);
+        assertNoProxy(intf);
 
         final List<Class> classes = new ArrayList<Class>();
         final TreeIterator<Notifier> it = resourceSet.getAllContents();
@@ -776,7 +841,7 @@ public final class SrcMixins4JUtils {
                 final EList<ClassifierReference> superTypes = clasz
                         .getSuperTypeReferences();
                 for (ClassifierReference superTypeRef : superTypes) {
-                    if (superTypeRef.getTarget().equals(mixinInterface)) {
+                    if (superTypeRef.getTarget().equals(intf)) {
                         classes.add(clasz);
                     }
                 }
@@ -785,7 +850,47 @@ public final class SrcMixins4JUtils {
         return classes;
     }
 
-    // TODO Cleanup
+    /**
+     * Creates a map with all mixin users (key) and a list of all mixin
+     * interfaces/providers (value).
+     * 
+     * @param resourceSet
+     *            Resource set to inspect.
+     * 
+     * @return Map from mixin users to interface/provider infos.
+     */
+    public static Map<Class, List<MixinInfo>> createUserMixinsMap(
+            final ResourceSet resourceSet) {
+
+        final Map<Class, List<MixinInfo>> userMixinsMap = new HashMap<Class, List<MixinInfo>>();
+        final List<Class> mixinProviderClasses = findMixinProviders(resourceSet);
+        for (final Class mixinProviderClass : mixinProviderClasses) {
+            final Interface mixinInterface = getMixinInterface(mixinProviderClass);
+            final List<Class> mixinUserClasses = findImplementors(resourceSet,
+                    mixinInterface);
+            for (final Class mixinUserClass : mixinUserClasses) {
+                List<MixinInfo> mixins = userMixinsMap.get(mixinUserClass);
+                if (mixins == null) {
+                    mixins = new ArrayList<MixinInfo>();
+                    userMixinsMap.put(mixinUserClass, mixins);
+                }
+                mixins.add(new MixinInfo(mixinProviderClass, mixinInterface));
+            }
+        }
+        return userMixinsMap;
+    }
+
+    /**
+     * Updates all mixin users.
+     * 
+     * @param resourceSet
+     *            Resource set to use.
+     * @param userMixinsMap
+     *            Map from mixin user to provider/interfaces.
+     * 
+     * @throws IOException
+     *             Error saving the changes.
+     */
     public static void applyMixins(final ResourceSet resourceSet,
             final Map<Class, List<MixinInfo>> userMixinsMap) throws IOException {
 
@@ -799,46 +904,40 @@ public final class SrcMixins4JUtils {
             final List<MixinInfo> mixinInfos = userMixinsMap
                     .get(mixinUserClass);
             for (final MixinInfo info : mixinInfos) {
-                applyMixin(mixinUserClass, info.getImplClass(),
+                applyMixin(mixinUserClass, info.getProvider(),
                         info.getInterface());
             }
             saveToFile(mixinUserClass);
         }
     }
 
-    // TODO Cleanup / Do we need this any more?
-    public static Map<Interface, Class> createMixinMap(
-            final ResourceSet resourceSet, final List<Interface> mixinInterfaces) {
+    /**
+     * Inspects the given resource set and updates all mixin user classes.
+     * 
+     * @param resourceSet
+     *            Resource set to inspect and update.
+     * 
+     * @throws IOException
+     *             Error saving the changed mixin user classes.
+     */
+    public static void applyMixins(final ResourceSet resourceSet)
+            throws IOException {
 
         assertArgNotNull("resourceSet", resourceSet);
-        assertArgNotNull("mixinInterfaces", mixinInterfaces);
 
-        final Map<Interface, Class> intfClassMap = new HashMap<Interface, Class>();
-        final TreeIterator<Notifier> it = resourceSet.getAllContents();
-        while (it.hasNext()) {
-            final Notifier notifier = it.next();
-            if (notifier instanceof Class) {
-                final Class clasz = (Class) notifier;
-                final AnnotationInstance ai = getAnnotationInstance(clasz,
-                        MixinProvider.class.getName());
-                if (ai != null) {
-                    final AnnotationParameter ap = ai.getParameter();
-                    if (ap instanceof SingleAnnotationParameter) {
-                        final SingleAnnotationParameter sap = (SingleAnnotationParameter) ap;
-                        final AnnotationValue value = sap.getValue();
-                        for (final Interface mixinInterface : mixinInterfaces) {
-                            // intfClassMap.put(mixinInterface, clasz);
-                            System.out.println(mixinInterface + ":" + clasz
-                                    + "=>" + value);
-                        }
-                    }
-                }
-            }
-        }
-        return intfClassMap;
+        applyMixins(resourceSet, createUserMixinsMap(resourceSet));
+
     }
 
-    // TODO Cleanup
+    /**
+     * Saves the given classifier.
+     * 
+     * @param classifier
+     *            Classifier to save.
+     * 
+     * @throws IOException
+     *             Error writing the changes to disk.
+     */
     public static void saveToFile(final Classifier classifier)
             throws IOException {
 
@@ -846,34 +945,6 @@ public final class SrcMixins4JUtils {
         assertNoProxy(classifier);
 
         classifier.eResource().save(null);
-
-    }
-
-    // TODO Cleanup
-    public final void execute(final ResourceSet resourceSet) throws IOException {
-
-        assertArgNotNull("resourceSet", resourceSet);
-
-        final Map<Class, List<MixinInfo>> userMixinsMap = new HashMap<Class, List<MixinInfo>>();
-
-        // Collect all classes that provide mixin code and classes that use
-        // mixins
-        final List<Class> mixinImplClasses = findAllMixinProviderClasses(resourceSet);
-        for (final Class mixinImplClass : mixinImplClasses) {
-            final Interface mixinInterface = getMixinInterface(mixinImplClass);
-            final List<Class> mixinUserClasses = findAllClassesImplementingMixin(
-                    resourceSet, mixinInterface);
-            for (final Class mixinUserClass : mixinUserClasses) {
-                List<MixinInfo> mixins = userMixinsMap.get(mixinUserClass);
-                if (mixins == null) {
-                    mixins = new ArrayList<MixinInfo>();
-                    userMixinsMap.put(mixinUserClass, mixins);
-                }
-                mixins.add(new MixinInfo(mixinImplClass, mixinInterface));
-            }
-        }
-
-        applyMixins(resourceSet, userMixinsMap);
 
     }
 
@@ -892,24 +963,42 @@ public final class SrcMixins4JUtils {
     }
 
     /**
-     * Helper class to store mixin interface and implementation together.
+     * Helper class to store mixin interface and provider together.
      */
-    private static final class MixinInfo {
+    public static final class MixinInfo {
 
-        private final Class implClass;
+        private final Class provider;
 
         private final Interface intf;
 
-        public MixinInfo(final Class implClass, final Interface intf) {
+        /**
+         * Constructor with provider and interface.
+         * 
+         * @param provider
+         *            Provides the mixin functionality.
+         * @param intf
+         *            Defines the mixin interface.
+         */
+        public MixinInfo(final Class provider, final Interface intf) {
             super();
-            this.implClass = implClass;
+            this.provider = provider;
             this.intf = intf;
         }
 
-        public final Class getImplClass() {
-            return implClass;
+        /**
+         * Returns the mixin provider.
+         * 
+         * @return Provider class.
+         */
+        public final Class getProvider() {
+            return provider;
         }
 
+        /**
+         * Returns the mixin interface.
+         * 
+         * @return Interface.
+         */
         public final Interface getInterface() {
             return intf;
         }
@@ -927,7 +1016,7 @@ public final class SrcMixins4JUtils {
 
         /**
          * Constructor with parameter.
-         *
+         * 
          * @param param
          *            Type parameter - Cannot be NULL.
          */
@@ -938,7 +1027,7 @@ public final class SrcMixins4JUtils {
 
         /**
          * Returns the type parameter.
-         *
+         * 
          * @return Type parameter.
          */
         public final TypeParameter getParam() {
@@ -947,7 +1036,7 @@ public final class SrcMixins4JUtils {
 
         /**
          * Returns the type argument.
-         *
+         * 
          * @return Type argument.
          */
         public final QualifiedTypeArgument getArg() {
@@ -956,7 +1045,7 @@ public final class SrcMixins4JUtils {
 
         /**
          * Sets the type argument to a new value.
-         *
+         * 
          * @param arg
          *            Type argument to set.
          */
@@ -976,7 +1065,7 @@ public final class SrcMixins4JUtils {
 
         /**
          * Returns the referenced type of the argument.
-         *
+         * 
          * @return Type or NULL if the parameter is not replaced.
          */
         public final Classifier getArgType() {
@@ -991,7 +1080,7 @@ public final class SrcMixins4JUtils {
 
         /**
          * Checks if the parameter is replaced by an argument.
-         *
+         * 
          * @return If the parameter is replaced TRUE, else FALSE.
          */
         public final boolean isParamReplaced() {

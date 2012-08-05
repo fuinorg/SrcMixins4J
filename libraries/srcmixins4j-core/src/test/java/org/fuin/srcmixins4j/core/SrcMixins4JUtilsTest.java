@@ -24,7 +24,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -50,6 +53,7 @@ import org.emftext.language.java.types.NamespaceClassifierReference;
 import org.emftext.language.java.types.Type;
 import org.fuin.srcmixins4j.annotations.MixinGenerated;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
+import org.fuin.srcmixins4j.core.SrcMixins4JUtils.MixinInfo;
 import org.fuin.srcmixins4j.core.SrcMixins4JUtils.TypeParam2Type;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -89,6 +93,12 @@ public final class SrcMixins4JUtilsTest {
             "TestMixinUser2.java");
     private static Class testMixinUser2Classifier;
 
+    private static File TEST_MIXIN_USER3 = new File(RES_DIR,
+            "TestMixinUser3.java");
+
+    private static File TEST_MIXIN_USER3_AFTER = new File(RES_DIR,
+            "TestMixinUser3_AFTER.java");
+
     // Generics
 
     private static File TEST_GENERIC_INTF = new File(RES_DIR,
@@ -115,34 +125,21 @@ public final class SrcMixins4JUtilsTest {
     public static void beforeClass() throws IOException {
 
         JaMoPPUtil.initialize();
-        resourceSet = new ResourceSetImpl();
+        resourceSet = createResourceSet(RES_DIR);
 
-        // Add the resource folder with test classes
-        JavaClasspath.get(resourceSet).registerSourceOrClassFileFolder(
-                URI.createFileURI(RES_DIR.getCanonicalPath()));
+        testIntfClassifier = loadClassifier(resourceSet, TEST_INTF);
+        testMixinIntfClassifier = loadClassifier(resourceSet, TEST_MIXIN_INTF);
+        testMixinProviderClassifier = loadClassifier(resourceSet, TEST_MIXIN_PROVIDER);
+        testMixinUserClassifier = loadClassifier(resourceSet, TEST_MIXIN_USER);
+        testMixinUser2Classifier = loadClassifier(resourceSet, TEST_MIXIN_USER2);
 
-        // Add annotations source folder
-        final File parentDir = new File(new File("..").getCanonicalPath());
-        final File annotationsDir = new File(parentDir,
-                "srcmixins4j-annotations");
-        final File annotationsJavaDir = new File(annotationsDir,
-                "src/main/java");
-        JavaClasspath.get(resourceSet).registerSourceOrClassFileFolder(
-                URI.createFileURI(annotationsJavaDir.getCanonicalPath()));
+        testGenericIntfClassifier = loadClassifier(resourceSet, TEST_GENERIC_INTF);
+        testGenericMixinIntfClassifier = loadClassifier(resourceSet, TEST_GENERIC_MIXIN_INTF);
+        testGenericMixinProviderClassifier = loadClassifier(resourceSet, TEST_GENERIC_MIXIN_PROVIDER);
+        testGenericMixinUserClassifier = loadClassifier(resourceSet, TEST_GENERIC_MIXIN_USER);
+        testGenericMixinUser2Classifier = loadClassifier(resourceSet, TEST_GENERIC_MIXIN_USER2);
 
-        testIntfClassifier = loadClassifier(TEST_INTF);
-        testMixinIntfClassifier = loadClassifier(TEST_MIXIN_INTF);
-        testMixinProviderClassifier = loadClassifier(TEST_MIXIN_PROVIDER);
-        testMixinUserClassifier = loadClassifier(TEST_MIXIN_USER);
-        testMixinUser2Classifier = loadClassifier(TEST_MIXIN_USER2);
-
-        testGenericIntfClassifier = loadClassifier(TEST_GENERIC_INTF);
-        testGenericMixinIntfClassifier = loadClassifier(TEST_GENERIC_MIXIN_INTF);
-        testGenericMixinProviderClassifier = loadClassifier(TEST_GENERIC_MIXIN_PROVIDER);
-        testGenericMixinUserClassifier = loadClassifier(TEST_GENERIC_MIXIN_USER);
-        testGenericMixinUser2Classifier = loadClassifier(TEST_GENERIC_MIXIN_USER2);
-
-        testClassA = loadClassifier(TEST_CLASS_A);
+        testClassA = loadClassifier(resourceSet, TEST_CLASS_A);
 
     }
 
@@ -151,12 +148,41 @@ public final class SrcMixins4JUtilsTest {
         resourceSet = null;
     }
 
-    private static Resource loadResource(final File file) throws IOException {
-        return loadResource(URI.createFileURI(file.getCanonicalPath()));
+    private void loadResources(final ResourceSet set, final File dir) throws IOException {
+        final File[] files = dir.listFiles();
+        for (final File file : files) {
+            if (file.isFile()) {
+                loadResource(set, file);
+            }
+        }
+    }
+    
+    private static ResourceSet createResourceSet(final File dir)
+            throws IOException {
+        final ResourceSet set = new ResourceSetImpl();
+
+        // Add the resource folder with test classes
+        JavaClasspath.get(set).registerSourceOrClassFileFolder(
+                URI.createFileURI(dir.getCanonicalPath()));
+
+        // Add annotations source folder
+        final File parentDir = new File(new File("..").getCanonicalPath());
+        final File annotationsDir = new File(parentDir,
+                "srcmixins4j-annotations");
+        final File annotationsJavaDir = new File(annotationsDir,
+                "src/main/java");
+        JavaClasspath.get(set).registerSourceOrClassFileFolder(
+                URI.createFileURI(annotationsJavaDir.getCanonicalPath()));
+
+        return set;
     }
 
-    private static Resource loadResource(final URI uri) throws IOException {
-        final Resource resource = resourceSet.getResource(uri, true);
+    private static Resource loadResource(final ResourceSet set, final File file) throws IOException {
+        return loadResource(set, URI.createFileURI(file.getCanonicalPath()));
+    }
+
+    private static Resource loadResource(final ResourceSet set, final URI uri) throws IOException {
+        final Resource resource = set.getResource(uri, true);
         assertThat(resource).isNotNull();
         return resource;
     }
@@ -178,10 +204,10 @@ public final class SrcMixins4JUtilsTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Classifier> T loadClassifier(final File file)
+    private static <T extends Classifier> T loadClassifier(final ResourceSet set, final File file)
             throws IOException {
 
-        final Resource resource = loadResource(file);
+        final Resource resource = loadResource(set, file);
         final CompilationUnit compilationUnit = SrcMixins4JUtils
                 .getCompilationUnit(resource);
         assertThat(compilationUnit).isNotNull();
@@ -198,8 +224,8 @@ public final class SrcMixins4JUtilsTest {
 
         // VERIFY
         assertThat(intfs).hasSize(1);
-        assertThat(SrcMixins4JUtils.getFullQualifiedName(intfs.get(0))).isEqualTo(
-                "a.b.c.TestMixinIntf");
+        assertThat(SrcMixins4JUtils.getFullQualifiedName(intfs.get(0)))
+                .isEqualTo("a.b.c.TestMixinIntf");
 
     }
 
@@ -279,8 +305,12 @@ public final class SrcMixins4JUtilsTest {
         final Method getXyzMethod = testMixinUserClassifier.getMethods().get(1);
         assertThat(getXyzMethod.getName()).isEqualTo("getXyz");
         assertThat(getXyzMethod.getTypeReference()).isNotNull();
-        assertThat(getXyzMethod.getTypeReference().getTarget()).isInstanceOf(Classifier.class);
-        assertThat(SrcMixins4JUtils.getFullQualifiedName((Classifier)getXyzMethod.getTypeReference().getTarget())).isEqualTo(String.class.getName());
+        assertThat(getXyzMethod.getTypeReference().getTarget()).isInstanceOf(
+                Classifier.class);
+        assertThat(
+                SrcMixins4JUtils.getFullQualifiedName((Classifier) getXyzMethod
+                        .getTypeReference().getTarget())).isEqualTo(
+                String.class.getName());
 
         // TEST REMOVE
         SrcMixins4JUtils.removeAllMixinMembers(testMixinUserClassifier);
@@ -365,7 +395,7 @@ public final class SrcMixins4JUtilsTest {
         assertThat(concreteClassifier).isNotNull();
         assertThat(concreteClassifier.eIsProxy()).isFalse();
 
-        final Resource resource = loadResource(TEST_MIXIN_PROVIDER);
+        final Resource resource = loadResource(resourceSet, TEST_MIXIN_PROVIDER);
         final CompilationUnit compilationUnit = SrcMixins4JUtils
                 .getCompilationUnit(resource);
 
@@ -382,7 +412,7 @@ public final class SrcMixins4JUtilsTest {
         final Class stringClass = testIntfClassifier.getStringClass();
         assertThat(stringClass).isNotNull();
         assertThat(stringClass.eIsProxy()).isFalse();
-        final Resource resource = loadResource(TEST_INTF);
+        final Resource resource = loadResource(resourceSet, TEST_INTF);
         final CompilationUnit compilationUnit = SrcMixins4JUtils
                 .getCompilationUnit(resource);
         assertThat(
@@ -407,7 +437,8 @@ public final class SrcMixins4JUtilsTest {
     public final void testGetFullQualifiedName() throws IOException {
 
         assertThat(
-                SrcMixins4JUtils.getFullQualifiedName(testMixinProviderClassifier))
+                SrcMixins4JUtils
+                        .getFullQualifiedName(testMixinProviderClassifier))
                 .isEqualTo("a.b.c.TestMixinProvider");
 
     }
@@ -613,12 +644,13 @@ public final class SrcMixins4JUtilsTest {
                 .createTypeParam2ArgMapping(testGenericMixinIntfClassifier,
                         testGenericMixinUserClassifier);
 
-        // TEST
+        // TEST & VERIFY
         assertThat(SrcMixins4JUtils.findMapping("A", typeParam2ArgList))
                 .isNotNull();
         assertThat(SrcMixins4JUtils.findMapping("B", typeParam2ArgList))
                 .isNotNull();
-        assertThat(SrcMixins4JUtils.findMapping("C", typeParam2ArgList)).isNull();
+        assertThat(SrcMixins4JUtils.findMapping("C", typeParam2ArgList))
+                .isNull();
 
     }
 
@@ -639,13 +671,91 @@ public final class SrcMixins4JUtilsTest {
                 testGenericMixinProviderClassifier,
                 testGenericMixinIntfClassifier);
 
-        final File expected = new File("src/test/TestApplyGenericMixinResult.java");
+        final File expected = new File(
+                "src/test/TestApplyGenericMixinResult.java");
 
         // TEST
         final File result = saveToTempFile(testGenericMixinUserClassifier
                 .eResource());
 
+        // VERIFY
         assertThat(result).hasSameContentAs(expected);
+
+    }
+
+    @Test
+    public final void testFindMixinProviders() {
+
+        // TEST
+        final List<Class> mixinProviders = SrcMixins4JUtils
+                .findMixinProviders(resourceSet);
+
+        // VERIFY
+        assertThat(mixinProviders).isNotNull();
+        assertThat(mixinProviders).hasSize(2);
+        assertThat(mixinProviders.get(0).getName()).isEqualTo(
+                "TestMixinProvider");
+        assertThat(mixinProviders.get(1).getName()).isEqualTo(
+                "TestGenericMixinProvider");
+
+    }
+
+    @Test
+    public final void testFindImplementors() {
+
+        // TEST
+        final List<Class> implementors = SrcMixins4JUtils.findImplementors(
+                resourceSet, testMixinIntfClassifier);
+
+        // VERIFY
+        assertThat(implementors).isNotNull();
+        assertThat(implementors).hasSize(2);
+        assertThat(implementors.get(0).getName()).isEqualTo("TestMixinUser");
+        assertThat(implementors.get(1).getName()).isEqualTo("TestMixinUser2");
+
+    }
+
+    @Test
+    public final void testCreateUserMixinsMap() {
+
+        // TEST
+        Map<Class, List<MixinInfo>> map = SrcMixins4JUtils
+                .createUserMixinsMap(resourceSet);
+
+        // VERIFY
+        assertThat(map).isNotNull();
+        assertThat(map).hasSize(4);
+        final Set<Class> users = map.keySet();
+        assertThat(users).contains(testMixinUserClassifier,
+                testMixinUser2Classifier, testGenericMixinUserClassifier,
+                testGenericMixinUser2Classifier);
+
+    }
+
+    @Test
+    public final void testApplyMixinsResourceSet() throws IOException {
+
+        // PREPARE
+        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File tmpSrcDir = new File(tmpDir, this.getClass().getSimpleName()
+                + ".src");
+
+        FileUtils.copyFile(TEST_INTF, new File(tmpSrcDir, TEST_INTF.getName()));
+        FileUtils.copyFile(TEST_MIXIN_INTF,
+                new File(tmpSrcDir, TEST_MIXIN_INTF.getName()));
+        FileUtils.copyFile(TEST_MIXIN_PROVIDER, new File(tmpSrcDir,
+                TEST_MIXIN_PROVIDER.getName()));
+        final File testMixinUser3File = new File(tmpSrcDir, TEST_MIXIN_USER3.getName());
+        FileUtils.copyFile(TEST_MIXIN_USER3, testMixinUser3File);
+
+        final ResourceSet set = createResourceSet(tmpSrcDir);
+        loadResources(set, tmpSrcDir);
+
+        // TEST
+        SrcMixins4JUtils.applyMixins(set);
+
+        // VERIFY
+        assertThat(testMixinUser3File).hasSameContentAs(TEST_MIXIN_USER3_AFTER);
 
     }
 
