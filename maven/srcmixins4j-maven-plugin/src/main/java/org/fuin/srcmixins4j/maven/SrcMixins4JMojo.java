@@ -98,8 +98,14 @@ public final class SrcMixins4JMojo extends AbstractMojo {
             LOG.debug("Register source directory: " + sourceRoot);
             JavaClasspath.get(resourceSet).registerSourceOrClassFileFolder(
                     URI.createFileURI(sourceRoot));
-            files.addAll(SrcMixins4JUtils.findRecursiveAllJavaFiles(new File(
-                    sourceRoot)));
+            final File dir = new File(sourceRoot);
+            files.addAll(SrcMixins4JUtils.findRecursiveAllJavaFiles(dir));
+            try {
+                SrcMixins4JUtils.loadResources(resourceSet, dir);
+            } catch (final IOException ex) {
+                throw new MojoExecutionException(
+                        "Error retrieving on eof the canonical path", ex);
+            }
         }
 
         return files;
