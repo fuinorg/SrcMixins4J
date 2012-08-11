@@ -51,7 +51,7 @@
                                         <artifactId>srcmixins4j-maven-plugin</artifactId>
                                         <versionRange>[0.2.0,)</versionRange>                                        
                                         <goals>                                        
-                                            <goal>process-template</goal>
+                                            <goal>process-mixins</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
@@ -87,13 +87,11 @@
                 <version>0.2.0</version>
                 <executions>
                     <execution>
-                        <phase>generate-sources</phase>
+                        <id>Process Mixins</id>
+                        <phase>process-sources</phase>
                         <goals>
-                            <goal>process-template</goal>
+                            <goal>process-mixins</goal>
                         </goals>
-                        <id>Generate sources</id>
-                        <configuration>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

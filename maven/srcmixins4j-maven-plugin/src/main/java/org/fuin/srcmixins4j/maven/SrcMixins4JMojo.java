@@ -44,8 +44,8 @@ import org.slf4j.impl.StaticLoggerBinder;
 /**
  * SrcMixins4J plugin for maven.
  * 
- * @goal process-template
- * @phase generate-sources
+ * @goal process-mixins
+ * @phase process-sources
  */
 public final class SrcMixins4JMojo extends AbstractMojo {
 
