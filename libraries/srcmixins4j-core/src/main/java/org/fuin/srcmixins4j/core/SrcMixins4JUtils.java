@@ -18,6 +18,7 @@
 package org.fuin.srcmixins4j.core;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.emftext.language.java.JavaClasspath;
 import org.emftext.language.java.annotations.AnnotationInstance;
 import org.emftext.language.java.annotations.AnnotationParameter;
 import org.emftext.language.java.annotations.AnnotationValue;
@@ -852,113 +854,6 @@ public final class SrcMixins4JUtils {
         return classes;
     }
 
-    /**
-     * Creates a map with all mixin users (key) and a list of all mixin
-     * interfaces/providers (value).
-     * 
-     * @param resourceSet
-     *            Resource set to inspect.
-     * 
-     * @return Map from mixin users to interface/provider infos.
-     */
-    public static Map<Class, List<MixinInfo>> createUserMixinsMap(
-            final ResourceSet resourceSet) {
-
-        final Map<Class, List<MixinInfo>> userMixinsMap = new HashMap<Class, List<MixinInfo>>();
-        final List<Class> mixinProviderClasses = findMixinProviders(resourceSet);
-        for (final Class mixinProviderClass : mixinProviderClasses) {
-            final Interface mixinInterface = getMixinInterface(mixinProviderClass);
-            final List<Class> mixinUserClasses = findImplementors(resourceSet,
-                    mixinInterface);
-            for (final Class mixinUserClass : mixinUserClasses) {
-                List<MixinInfo> mixins = userMixinsMap.get(mixinUserClass);
-                if (mixins == null) {
-                    mixins = new ArrayList<MixinInfo>();
-                    userMixinsMap.put(mixinUserClass, mixins);
-                }
-                mixins.add(new MixinInfo(mixinProviderClass, mixinInterface));
-            }
-        }
-        return userMixinsMap;
-    }
-
-    /**
-     * Updates all mixin users.
-     * 
-     * @param resourceSet
-     *            Resource set to use.
-     * @param userMixinsMap
-     *            Map from mixin user to provider/interfaces.
-     * 
-     * @return List of changed mixin user classes.
-     * 
-     * @throws IOException
-     *             Error saving the changes.
-     */
-    public static List<Class> applyMixins(final ResourceSet resourceSet,
-            final Map<Class, List<MixinInfo>> userMixinsMap) throws IOException {
-
-        assertArgNotNull("resourceSet", resourceSet);
-        assertArgNotNull("userMixinsMap", userMixinsMap);
-
-        final List<Class> mixinUsers = new ArrayList<Class>();
-        
-        final Iterator<Class> it = userMixinsMap.keySet().iterator();
-        while (it.hasNext()) {
-            final Class mixinUserClass = it.next();
-            removeAllMixinMembers(mixinUserClass);
-            final List<MixinInfo> mixinInfos = userMixinsMap
-                    .get(mixinUserClass);
-            for (final MixinInfo info : mixinInfos) {
-                applyMixin(mixinUserClass, info.getProvider(),
-                        info.getInterface());
-            }
-            saveToFile(mixinUserClass);
-            mixinUsers.add(mixinUserClass);
-        }
-        
-        return mixinUsers;
-    }
-
-    /**
-     * Inspects the given resource set and updates all mixin user classes.
-     * 
-     * @param resourceSet
-     *            Resource set to inspect and update.
-     * 
-     * @return List of changed mixin user classes.
-     * 
-     * @throws IOException
-     *             Error saving the changed mixin user classes.
-     */
-    public static List<Class> applyMixins(final ResourceSet resourceSet)
-            throws IOException {
-
-        assertArgNotNull("resourceSet", resourceSet);
-
-        return applyMixins(resourceSet, createUserMixinsMap(resourceSet));
-
-    }
-
-    /**
-     * Saves the given classifier.
-     * 
-     * @param classifier
-     *            Classifier to save.
-     * 
-     * @throws IOException
-     *             Error writing the changes to disk.
-     */
-    public static void saveToFile(final Classifier classifier)
-            throws IOException {
-
-        assertArgNotNull("classifier", classifier);
-        assertNoProxy(classifier);
-
-        classifier.eResource().save(null);
-
-    }
-
     private static void assertArgNotNull(final String argName,
             final Object argValue) {
         if (argValue == null) {
@@ -1125,6 +1020,36 @@ public final class SrcMixins4JUtils {
                 loadResources(resourceSet, file);
             }
         }
+    }
+
+    /**
+     * Returns a list of all java files in a directory and it's sub directories..
+     * 
+     * @param dir Directory to scan for java files.
+     * 
+     * @return List of all java files.
+     */
+    public static List<File> findRecursiveAllJavaFiles(final File dir) {
+
+        final List<File> files = new ArrayList<File>();
+        
+        final File[] found = dir.listFiles(new FileFilter() {
+            @Override
+            public final boolean accept(final File file) {                
+                return file.isDirectory() || file.getName().endsWith(".java");
+            }
+        });
+        
+        for (final File file : found) {
+            if (file.isDirectory()) {
+                files.addAll(findRecursiveAllJavaFiles(file));
+            } else {
+                files.add(file);
+            }
+        }
+        
+        return files;
+        
     }
     
 }

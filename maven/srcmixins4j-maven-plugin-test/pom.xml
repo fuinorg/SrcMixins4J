@@ -49,14 +49,14 @@
                                     <pluginExecutionFilter>
                                         <groupId>org.fuin.srcmixins4j</groupId>
                                         <artifactId>srcmixins4j-maven-plugin</artifactId>
-                                        <versionRange>[0.1.0,)</versionRange>                                        
+                                        <versionRange>[0.2.0,)</versionRange>                                        
                                         <goals>                                        
                                             <goal>process-template</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
                                         <execute>
-                                            <runOnIncremental>true</runOnIncremental>
+                                            <runOnIncremental>false</runOnIncremental>
                                         </execute>
                                     </action>
                                 </pluginExecution>

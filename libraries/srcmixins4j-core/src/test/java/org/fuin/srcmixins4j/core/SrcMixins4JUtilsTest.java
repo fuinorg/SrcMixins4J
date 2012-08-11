@@ -63,7 +63,7 @@ import org.junit.Test;
  * Test for the {@link SrcMixins4JUtils} class.
  */
 // CHECKSTYLE:OFF
-public final class SrcMixins4JUtilsTest {
+public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
 
     private static File RES_DIR = new File("src/test/resources");
 
@@ -92,12 +92,6 @@ public final class SrcMixins4JUtilsTest {
     private static File TEST_MIXIN_USER2 = new File(RES_DIR,
             "TestMixinUser2.java");
     private static Class testMixinUser2Classifier;
-
-    private static File TEST_MIXIN_USER3 = new File(RES_DIR,
-            "TestMixinUser3.java");
-
-    private static File TEST_MIXIN_USER3_AFTER = new File(RES_DIR,
-            "TestMixinUser3_AFTER.java");
 
     // Generics
 
@@ -146,27 +140,6 @@ public final class SrcMixins4JUtilsTest {
     @AfterClass
     public static void afterClass() {
         resourceSet = null;
-    }
-
-    
-    private static ResourceSet createResourceSet(final File dir)
-            throws IOException {
-        final ResourceSet set = new ResourceSetImpl();
-
-        // Add the resource folder with test classes
-        JavaClasspath.get(set).registerSourceOrClassFileFolder(
-                URI.createFileURI(dir.getCanonicalPath()));
-
-        // Add annotations source folder
-        final File parentDir = new File(new File("..").getCanonicalPath());
-        final File annotationsDir = new File(parentDir,
-                "srcmixins4j-annotations");
-        final File annotationsJavaDir = new File(annotationsDir,
-                "src/main/java");
-        JavaClasspath.get(set).registerSourceOrClassFileFolder(
-                URI.createFileURI(annotationsJavaDir.getCanonicalPath()));
-
-        return set;
     }
 
     private static Resource loadResource(final ResourceSet set, final File file) throws IOException {
@@ -704,50 +677,6 @@ public final class SrcMixins4JUtilsTest {
         assertThat(implementors).hasSize(2);
         assertThat(implementors.get(0).getName()).isEqualTo("TestMixinUser");
         assertThat(implementors.get(1).getName()).isEqualTo("TestMixinUser2");
-
-    }
-
-    @Test
-    public final void testCreateUserMixinsMap() {
-
-        // TEST
-        Map<Class, List<MixinInfo>> map = SrcMixins4JUtils
-                .createUserMixinsMap(resourceSet);
-
-        // VERIFY
-        assertThat(map).isNotNull();
-        assertThat(map).hasSize(4);
-        final Set<Class> users = map.keySet();
-        assertThat(users).contains(testMixinUserClassifier,
-                testMixinUser2Classifier, testGenericMixinUserClassifier,
-                testGenericMixinUser2Classifier);
-
-    }
-
-    @Test
-    public final void testApplyMixinsResourceSet() throws IOException {
-
-        // PREPARE
-        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        final File tmpSrcDir = new File(tmpDir, this.getClass().getSimpleName()
-                + ".src");
-
-        FileUtils.copyFile(TEST_INTF, new File(tmpSrcDir, TEST_INTF.getName()));
-        FileUtils.copyFile(TEST_MIXIN_INTF,
-                new File(tmpSrcDir, TEST_MIXIN_INTF.getName()));
-        FileUtils.copyFile(TEST_MIXIN_PROVIDER, new File(tmpSrcDir,
-                TEST_MIXIN_PROVIDER.getName()));
-        final File testMixinUser3File = new File(tmpSrcDir, TEST_MIXIN_USER3.getName());
-        FileUtils.copyFile(TEST_MIXIN_USER3, testMixinUser3File);
-
-        final ResourceSet set = createResourceSet(tmpSrcDir);
-        SrcMixins4JUtils.loadResources(set, tmpSrcDir);
-
-        // TEST
-        SrcMixins4JUtils.applyMixins(set);
-
-        // VERIFY
-        assertThat(testMixinUser3File).hasSameContentAs(TEST_MIXIN_USER3_AFTER);
 
     }
 

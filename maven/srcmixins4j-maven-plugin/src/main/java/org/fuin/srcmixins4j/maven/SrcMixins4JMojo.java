@@ -19,6 +19,7 @@ package org.fuin.srcmixins4j.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -32,8 +33,9 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.emftext.language.java.JavaClasspath;
-import org.emftext.language.java.classifiers.Class;
 import org.emftext.language.java.resource.JaMoPPUtil;
+import org.fuin.srcmixins4j.core.SrcMixins4JAnalyzer;
+import org.fuin.srcmixins4j.core.SrcMixins4JAnalyzerFileContext;
 import org.fuin.srcmixins4j.core.SrcMixins4JUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,42 +79,30 @@ public final class SrcMixins4JMojo extends AbstractMojo {
 
         final ResourceSet resourceSet = new ResourceSetImpl();
         registerJarFiles(resourceSet);
-        registerSourceDirectories(resourceSet);
+        final List<File> files = registerSourceDirectories(resourceSet);
 
-        try {
-            final List<Class> mixinUsers = SrcMixins4JUtils.applyMixins(resourceSet);
-            
-        } catch (final IOException ex) {
-            throw new MojoExecutionException("Error applying mixin", ex);
-        }
+        new SrcMixins4JAnalyzer().analyze(new SrcMixins4JAnalyzerFileContext(
+                files, resourceSet));
 
     }
 
     @SuppressWarnings("unchecked")
-    private void registerSourceDirectories(final ResourceSet resourceSet)
+    private List<File> registerSourceDirectories(final ResourceSet resourceSet)
             throws MojoExecutionException {
+
+        final List<File> files = new ArrayList<File>();
 
         final List<String> sourceRoots = project.getCompileSourceRoots();
         LOG.debug("SourceRoots: " + sourceRoots.size());
         for (final String sourceRoot : sourceRoots) {
-            registerSrcFolder(resourceSet, sourceRoot);
+            LOG.debug("Register source directory: " + sourceRoot);
+            JavaClasspath.get(resourceSet).registerSourceOrClassFileFolder(
+                    URI.createFileURI(sourceRoot));
+            files.addAll(SrcMixins4JUtils.findRecursiveAllJavaFiles(new File(
+                    sourceRoot)));
         }
 
-    }
-
-    private void registerSrcFolder(final ResourceSet resourceSet,
-            final String sourceRoot) throws MojoExecutionException {
-
-        LOG.debug("Register source directory: " + sourceRoot);
-
-        JavaClasspath.get(resourceSet).registerSourceOrClassFileFolder(
-                URI.createFileURI(sourceRoot));
-        try {
-            SrcMixins4JUtils.loadResources(resourceSet, new File(sourceRoot));
-        } catch (final IOException ex) {
-            throw new MojoExecutionException(
-                    "Error registering source directory: " + sourceRoot, ex);
-        }
+        return files;
 
     }
 
@@ -133,7 +123,13 @@ public final class SrcMixins4JMojo extends AbstractMojo {
                 final File file = new File(localRepositoryDir,
                         local.pathOf(artifact));
                 if (file.exists()) {
-                    registerJarFile(resourceSet, file);
+                    try {
+                        JavaClasspath.get(resourceSet).registerClassifierJar(
+                                URI.createFileURI(file.getCanonicalPath()));
+                    } catch (final IOException ex) {
+                        throw new MojoExecutionException(
+                                "Error retrieving canonical path: " + file, ex);
+                    }
                 } else {
                     LOG.debug("No JAR file found: " + dependency + " [" + file
                             + "]");
@@ -145,18 +141,6 @@ public final class SrcMixins4JMojo extends AbstractMojo {
 
         }
 
-    }
-
-    private void registerJarFile(final ResourceSet resourceSet, final File file)
-            throws MojoExecutionException {
-        LOG.info("Register JAR file: " + file);
-        try {
-            JavaClasspath.get(resourceSet).registerClassifierJar(
-                    URI.createFileURI(file.getCanonicalPath()));
-        } catch (final IOException ex) {
-            throw new MojoExecutionException("Error registering JAR: " + file,
-                    ex);
-        }
     }
 
 }
