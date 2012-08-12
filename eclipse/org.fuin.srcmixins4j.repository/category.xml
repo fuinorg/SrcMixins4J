@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.fuin.srcmixins4j.feature-0.2.0.jar" id="org.fuin.srcmixins4j.feature" version="0.2.0">
+   <feature id="org.fuin.srcmixins4j.feature" version="0.0.0">
       <category name="org.fuin.srcmixins4j.category"/>
    </feature>
    <category-def name="org.fuin.srcmixins4j.category" label="SrcMixins4J">
