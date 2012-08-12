@@ -66,6 +66,12 @@
                 <version>2.3.7</version>
                 <configuration>
                     <manifestLocation>${manifest-location}</manifestLocation>
+                    <instructions>
+                        <_removeheaders>
+                            Built-By,Tool,Build-Jdk,Created-By,
+                            Bnd-LastModified, Private-Package
+                        </_removeheaders>
+                    </instructions>
                 </configuration>
                 <executions>
                     <execution>

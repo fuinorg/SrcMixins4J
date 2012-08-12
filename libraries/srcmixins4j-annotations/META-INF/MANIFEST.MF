@@ -1,7 +1,4 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1344759226529
-Build-Jdk: 1.6.0_33
-Built-By: Michael Schnell
 Bundle-Description: Source code based mixins for Java / Libraries Parent
 Bundle-DocURL: http://www.fuin.org
 Bundle-License: http://www.fsf.org/licensing/licenses/lgpl.html
@@ -11,6 +8,4 @@ Bundle-SymbolicName: org.fuin.srcmixins4j.annotations
 Bundle-Vendor: Future Invent Informationsmanagement GmbH - Hamburg (Germ
  any)
 Bundle-Version: 0.2.0
-Created-By: Apache Maven Bundle Plugin
 Export-Package: org.fuin.srcmixins4j.annotations;version="0.2.0"
-Tool: Bnd-1.50.0

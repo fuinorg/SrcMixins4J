@@ -1,7 +1,4 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1344759226951
-Build-Jdk: 1.6.0_33
-Built-By: Michael Schnell
 Bundle-Description: Source code based mixins for Java / Libraries Parent
 Bundle-DocURL: http://www.fuin.org
 Bundle-License: http://www.fsf.org/licensing/licenses/lgpl.html
@@ -11,7 +8,6 @@ Bundle-SymbolicName: org.fuin.srcmixins4j.core
 Bundle-Vendor: Future Invent Informationsmanagement GmbH - Hamburg (Germ
  any)
 Bundle-Version: 0.2.0
-Created-By: Apache Maven Bundle Plugin
 Export-Package: org.fuin.srcmixins4j.core;uses:="org.eclipse.emf.ecore.r
  esource,org.emftext.language.java.classifiers,org.eclipse.emf.common.ut
  il,org.emftext.language.java.annotations,org.emftext.language.java.reso
@@ -32,4 +28,3 @@ Import-Package: org.eclipse.emf.common.notify,org.eclipse.emf.common.uti
  ge.java.resource.java,org.emftext.language.java.resource.java.mopp,org.
  emftext.language.java.types,org.fuin.srcmixins4j.annotations;version="[
  0.2,1)"
-Tool: Bnd-1.50.0
