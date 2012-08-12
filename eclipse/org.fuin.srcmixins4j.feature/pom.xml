@@ -13,20 +13,4 @@
     <packaging>eclipse-feature</packaging>
     <name>SrcMixins4J Feature</name>
 
-    <dependencies>
-
-        <dependency>
-            <groupId>org.fuin.srcmixins4j</groupId>
-            <artifactId>srcmixins4j-annotations</artifactId>
-            <version>0.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.fuin.srcmixins4j</groupId>
-            <artifactId>srcmixins4j-core</artifactId>
-            <version>0.2.0</version>
-        </dependency>
-
-    </dependencies>
-
 </project>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="SrcMixins4J" uid="org.fuin.srcmixins4j.product.uid" id="org.fuin.srcmixins4j.product" application="org.fuin.srcmixins4j.application" version="0.2.0" useFeatures="true" includeLaunchers="false">
+
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+   </launcherArgs>
+
+   <windowImages/>
+
+
+   <launcher>
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+
+   <vm>
+   </vm>
+
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="org.fuin.srcmixins4j.feature" version="0.2.0"/>
+   </features>
+
+
+</product>

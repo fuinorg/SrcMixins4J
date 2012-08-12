@@ -51,10 +51,26 @@
     </distributionManagement>
 
     <modules>
+    	<module>org.fuin.srcmixins4j.repository</module>
         <module>org.fuin.srcmixins4j.plugin</module>
 		<module>org.fuin.srcmixins4j.feature</module>
     </modules>
 
+    <dependencies>
+
+        <dependency>
+            <groupId>org.fuin.srcmixins4j</groupId>
+            <artifactId>srcmixins4j-annotations</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fuin.srcmixins4j</groupId>
+            <artifactId>srcmixins4j-core</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+
+    </dependencies>
 
     <build>
 
