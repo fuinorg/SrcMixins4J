@@ -16,5 +16,10 @@ Require-Bundle: org.eclipse.ui,
 Bundle-Activator: org.fuin.srcmixins4j.plugin.SrcMixins4JPlugin
 Import-Package: org.fuin.srcmixins4j.annotations,
  org.fuin.srcmixins4j.core
-Export-Package: org.fuin.srcmixins4j.plugin
+Export-Package: org.fuin.srcmixins4j.plugin,
+ org.fuin.srcmixins4j.annotations,
+ org.fuin.srcmixins4j.core
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,
+  lib/srcmixins4j-annotations-0.2.0.jar,
+  lib/srcmixins4j-core-0.2.0.jar
