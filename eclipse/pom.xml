@@ -40,6 +40,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tycho-version>0.15.0</tycho-version>
+        <srcmixins4j-annotations-version>0.2.0</srcmixins4j-annotations-version>
+        <srcmixins4j-core-version>0.2.0</srcmixins4j-core-version>
         <manifest-location>META-INF</manifest-location>
     </properties>
 
@@ -61,13 +63,13 @@
         <dependency>
             <groupId>org.fuin.srcmixins4j</groupId>
             <artifactId>srcmixins4j-annotations</artifactId>
-            <version>0.2.0</version>
+            <version>${srcmixins4j-annotations-version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.fuin.srcmixins4j</groupId>
             <artifactId>srcmixins4j-core</artifactId>
-            <version>0.2.0</version>
+            <version>${srcmixins4j-core-version}</version>
         </dependency>
 
     </dependencies>

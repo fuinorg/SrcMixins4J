@@ -69,14 +69,14 @@
 								<artifactItem>
 									<groupId>org.fuin.srcmixins4j</groupId>
 									<artifactId>srcmixins4j-annotations</artifactId>
-									<version>0.2.0</version>
+									<version>${srcmixins4j-annotations-version}</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${basedir}/lib</outputDirectory>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.fuin.srcmixins4j</groupId>
 									<artifactId>srcmixins4j-core</artifactId>
-									<version>0.2.0</version>
+									<version>${srcmixins4j-core-version}</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${basedir}/lib</outputDirectory>
 								</artifactItem>
