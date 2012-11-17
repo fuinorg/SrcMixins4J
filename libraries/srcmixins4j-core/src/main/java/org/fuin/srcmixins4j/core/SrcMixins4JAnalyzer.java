@@ -31,11 +31,16 @@ import org.emftext.language.java.resource.java.JavaEProblemType;
 import org.emftext.language.java.resource.java.mopp.JavaResource;
 import org.fuin.srcmixins4j.annotations.MixinIntf;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Analyzes resources and applies mixin code.
  */
 public final class SrcMixins4JAnalyzer {
+
+    private static final Logger LOG = LoggerFactory
+            .getLogger(SrcMixins4JAnalyzer.class);
 
     /**
      * Analyze all resources in the given context.
@@ -44,6 +49,9 @@ public final class SrcMixins4JAnalyzer {
      *            Context to analyze.
      */
     public final void analyze(final SrcMixins4JAnalyzerContext context) {
+
+        LOG.trace("BEGIN analyze(SrcMixins4JAnalyzerContext)");
+
         while (context.hasNextResource()) {
             final Resource resource = context.nextResource();
             if (resource == null) {
@@ -52,6 +60,9 @@ public final class SrcMixins4JAnalyzer {
             }
             analyze(context, resource);
         }
+
+        LOG.trace("END analyze(SrcMixins4JAnalyzerContext)");
+
     }
 
     /**
@@ -65,40 +76,49 @@ public final class SrcMixins4JAnalyzer {
     public final void analyze(final SrcMixins4JAnalyzerContext context,
             final Resource resource) {
 
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN analyze(SrcMixins4JAnalyzerContext, Resource)");
+            LOG.trace("resource: " + resource.getURI());
+        }
+
         final CompilationUnit cu = SrcMixins4JUtils
                 .getCompilationUnit(resource);
         if (cu == null) {
-            return;
-        }
+            LOG.debug("cu == null");
+        } else {
+            LOG.debug("cu == " + cu.getName());
 
-        final EList<ConcreteClassifier> classifiers = cu.getClassifiers();
-        for (final ConcreteClassifier classifier : classifiers) {
-            if (classifier instanceof Class) {
-                final Class clasz = (Class) classifier;
-                final AnnotationInstance mixinProviderAnnotation = SrcMixins4JUtils
-                        .getAnnotationInstance(clasz,
-                                MixinProvider.class.getName());
-                if (mixinProviderAnnotation == null) {
-                    final List<Interface> mixinInterfaces = SrcMixins4JUtils
-                            .getMixinInterfaces(clasz);
-                    if (mixinInterfaces.size() == 0) {
-                        handleStandardClassChanged(context, resource, clasz);
+            final EList<ConcreteClassifier> classifiers = cu.getClassifiers();
+            for (final ConcreteClassifier classifier : classifiers) {
+                if (classifier instanceof Class) {
+                    final Class clasz = (Class) classifier;
+                    final AnnotationInstance mixinProviderAnnotation = SrcMixins4JUtils
+                            .getAnnotationInstance(clasz,
+                                    MixinProvider.class.getName());
+                    if (mixinProviderAnnotation == null) {
+                        final List<Interface> mixinInterfaces = SrcMixins4JUtils
+                                .getMixinInterfaces(clasz);
+                        if (mixinInterfaces.size() == 0) {
+                            handleStandardClassChanged(context, resource, clasz);
+                        } else {
+                            handleMixinUserChanged(context, resource, clasz,
+                                    mixinInterfaces);
+                        }
                     } else {
-                        handleMixinUserChanged(context, resource, clasz,
-                                mixinInterfaces);
+                        handleMixinProviderChanged(context, resource, clasz,
+                                mixinProviderAnnotation);
                     }
-                } else {
-                    handleMixinProviderChanged(context, resource, clasz,
-                            mixinProviderAnnotation);
-                }
-            } else if (classifier instanceof Interface) {
-                final Interface intf = (Interface) classifier;
-                if (SrcMixins4JUtils.getAnnotationInstance(intf,
-                        MixinIntf.class.getName()) != null) {
-                    handleMixinIntfChanged(context, resource, intf);
+                } else if (classifier instanceof Interface) {
+                    final Interface intf = (Interface) classifier;
+                    if (SrcMixins4JUtils.getAnnotationInstance(intf,
+                            MixinIntf.class.getName()) != null) {
+                        handleMixinIntfChanged(context, resource, intf);
+                    }
                 }
             }
         }
+
+        LOG.trace("END analyze(SrcMixins4JAnalyzerContext, Resource)");
 
     }
 
@@ -106,14 +126,29 @@ public final class SrcMixins4JAnalyzer {
             final SrcMixins4JAnalyzerContext context, final Resource resource,
             final Interface intf) {
 
-        System.out.println(intf.getName() + " is a mixin interface");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN handleMixinIntfChanged(SrcMixins4JAnalyzerContext, Resource, Interface)");
+            LOG.trace("resource: " + resource.getURI());
+            LOG.trace("intf: " + intf.getName());
+        }
+        LOG.info(intf.getName() + " is a mixin interface");
+
+        LOG.trace("END handleMixinIntfChanged(SrcMixins4JAnalyzerContext, Resource, Interface)");
+
     }
 
     private void handleMixinProviderChanged(
             final SrcMixins4JAnalyzerContext context, final Resource resource,
             final Class clasz, final AnnotationInstance ai) {
 
-        System.out.println(clasz.getName() + " is a mixin provider");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN handleMixinProviderChanged(SrcMixins4JAnalyzerContext, Resource, "
+                    + "clasz, AnnotationInstance)");
+            LOG.trace("resource: " + resource.getURI());
+            LOG.trace("clasz: " + clasz.getName());
+            LOG.trace("ai: " + ai);
+        }
+        LOG.info(clasz.getName() + " is a mixin provider");
 
         final Interface mixinIntf = SrcMixins4JUtils.getMixinInterface(clasz);
         if (mixinIntf == null) {
@@ -126,7 +161,7 @@ public final class SrcMixins4JAnalyzer {
         }
         final List<Class> mixinUsers = context.findMixinUsers(mixinIntf);
         for (final Class mixinUser : mixinUsers) {
-            System.out.println("    " + mixinUser.getName() + " uses mixin "
+            LOG.info("    " + mixinUser.getName() + " uses mixin "
                     + mixinIntf.getName());
             final List<Interface> mixinInterfaces = SrcMixins4JUtils
                     .getMixinInterfaces(mixinUser);
@@ -134,16 +169,26 @@ public final class SrcMixins4JAnalyzer {
                     mixinInterfaces);
         }
 
+        LOG.trace("END handleMixinProviderChanged(SrcMixins4JAnalyzerContext, Resource, "
+                + "clasz, AnnotationInstance)");
+
     }
 
     private void handleStandardClassChanged(
             final SrcMixins4JAnalyzerContext context, final Resource resource,
             final Class clasz) {
 
-        System.out.println(clasz.getName() + " is a standard class");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN handleStandardClassChanged(SrcMixins4JAnalyzerContext, Resource, Class)");
+            LOG.trace("resource: " + resource.getURI());
+            LOG.trace("clasz: " + clasz.getName());
+        }
+        LOG.info(clasz.getName() + " is a standard class");
 
         SrcMixins4JUtils.removeAllMixinMembers(clasz);
         save(context, resource);
+
+        LOG.trace("END handleStandardClassChanged(SrcMixins4JAnalyzerContext, Resource, Class)");
 
     }
 
@@ -151,31 +196,48 @@ public final class SrcMixins4JAnalyzer {
             final SrcMixins4JAnalyzerContext context, final Resource resource,
             final Class clasz, final List<Interface> mixinIntfs) {
 
-        System.out.println(clasz.getName() + " is a mixin user");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN handleMixinUserChanged(SrcMixins4JAnalyzerContext, Resource, List<Interface>)");
+            LOG.trace("resource: " + resource.getURI());
+            LOG.trace("clasz: " + clasz.getName());
+            LOG.trace("mixinIntfs: " + mixinIntfs);
+        }
+        LOG.info(clasz.getName() + " is a mixin user");
 
         SrcMixins4JUtils.removeAllMixinMembers(clasz);
 
         for (Interface mixinIntf : mixinIntfs) {
-            System.out.print("    " + mixinIntf.getName());
+            LOG.info("    " + mixinIntf.getName());
             final Class provider = context.findMixinProvider(mixinIntf);
             if (provider != null) {
-                System.out.println(" implemented by " + provider.getName());
+                LOG.info(" implemented by " + provider.getName());
                 SrcMixins4JUtils.applyMixin(clasz, provider, mixinIntf);
             }
         }
 
         save(context, resource);
 
+        LOG.trace("END handleMixinUserChanged(SrcMixins4JAnalyzerContext, Resource, List<Interface>)");
+
     }
 
     private void save(final SrcMixins4JAnalyzerContext context,
             final Resource resource) {
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN save(SrcMixins4JAnalyzerContext, Resource)");
+            LOG.trace("resource: " + resource.getURI());
+        }
+
         try {
             resource.save(null);
             context.markResourceAsChanged();
         } catch (final IOException ex) {
             throw new RuntimeException(ex);
         }
+
+        LOG.trace("END save(SrcMixins4JAnalyzerContext, Resource)");
+
     }
 
 }

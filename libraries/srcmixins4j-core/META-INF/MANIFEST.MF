@@ -10,14 +10,14 @@ Bundle-Vendor: Future Invent Informationsmanagement GmbH - Hamburg (Germ
 Bundle-Version: 0.2.0
 Export-Package: org.fuin.srcmixins4j.core;uses:="org.eclipse.emf.ecore.r
  esource,org.emftext.language.java.classifiers,org.eclipse.emf.common.ut
- il,org.emftext.language.java.annotations,org.emftext.language.java.reso
- urce.java,org.eclipse.emf.ecore,org.emftext.language.java.resource.java
- .mopp,org.emftext.language.java.containers,org.fuin.srcmixins4j.annotat
- ions,org.emftext.language.java.modifiers,org.emftext.language.java.gene
- rics,org.emftext.language.java.types,org.emftext.language.java.referenc
- es,org.eclipse.emf.common.notify,org.eclipse.emf.ecore.util,org.emftext
- .language.java.imports,org.emftext.language.java.members,org.emftext.la
- nguage.java.parameters";version="0.2.0"
+ il,org.emftext.language.java.annotations,org.slf4j,org.emftext.language
+ .java.resource.java,org.eclipse.emf.ecore,org.emftext.language.java.res
+ ource.java.mopp,org.emftext.language.java.containers,org.fuin.srcmixins
+ 4j.annotations,org.emftext.language.java.modifiers,org.emftext.language
+ .java.generics,org.emftext.language.java.types,org.emftext.language.jav
+ a.references,org.eclipse.emf.common.notify,org.eclipse.emf.ecore.util,o
+ rg.emftext.language.java.imports,org.emftext.language.java.members,org.
+ emftext.language.java.parameters";version="0.2.0"
 Import-Package: org.eclipse.emf.common.notify,org.eclipse.emf.common.uti
  l,org.eclipse.emf.ecore,org.eclipse.emf.ecore.resource,org.eclipse.emf.
  ecore.util,org.emftext.language.java.annotations,org.emftext.language.j
@@ -26,5 +26,5 @@ Import-Package: org.eclipse.emf.common.notify,org.eclipse.emf.common.uti
  .java.members,org.emftext.language.java.modifiers,org.emftext.language.
  java.parameters,org.emftext.language.java.references,org.emftext.langua
  ge.java.resource.java,org.emftext.language.java.resource.java.mopp,org.
- emftext.language.java.types,org.fuin.srcmixins4j.annotations;version="[
- 0.2,1)"
+ emftext.language.java.types,org.fuin.srcmixins4j.annotations,org.slf4j;
+ version="[1.6,2)"
