@@ -17,17 +17,28 @@
  */
 package org.fuin.srcmixins4j.plugin;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.compiler.BuildContext;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
+import org.emftext.language.java.JavaClasspath;
 import org.fuin.srcmixins4j.core.SrcMixins4JAnalyzer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adds/Removes mixin related code from the compiled classes.
  */
 public final class SrcMixins4JCompilationParticipant extends
         CompilationParticipant {
+
+    private static final Logger LOG = LoggerFactory
+            .getLogger(SrcMixins4JCompilationParticipant.class);
 
     private IJavaProject project;
 
@@ -38,6 +49,7 @@ public final class SrcMixins4JCompilationParticipant extends
 
     @Override
     public int aboutToBuild(final IJavaProject project) {
+        LOG.info("aboutToBuild: " + project.getElementName());
         this.project = project;
         return READY_FOR_BUILD;
     }
@@ -46,17 +58,75 @@ public final class SrcMixins4JCompilationParticipant extends
     public final void buildStarting(final BuildContext[] buildContexts,
             final boolean isBatch) {
 
+        LOG.info("buildStarting: batch=" + isBatch + ", annotationProcessor="
+                + isAnnotationProcessor());
+
         if (buildContexts.length == 0) {
             // Nothing to do...
             return;
         }
-
+        
         final ResourceSet resourceSet = SrcMixins4JPlugin.getDefault()
                 .getResourceSet(project);
 
-        new SrcMixins4JAnalyzer().analyze(new SrcMixins4JAnalyzerEclipseContext(project,
-                buildContexts, resourceSet));
+        new SrcMixins4JAnalyzer()
+                .analyze(new SrcMixins4JAnalyzerEclipseContext(project,
+                        buildContexts, resourceSet));
 
     }
+
+    @Override
+    public final void buildFinished(final IJavaProject project) {
+        if (LOG.isInfoEnabled()) {
+            final ResourceSet resourceSet = SrcMixins4JPlugin.getDefault()
+                    .getResourceSet(project);
+            dumpClassPath(project, resourceSet);
+        }
+        LOG.info("buildFinished: " + project.getElementName());
+    }
+
+    // @formatter:off
+    private static void dumpClassPath(final IJavaProject project, final ResourceSet resourceSet) {
+        LOG.info("PROJECT: " + project.getElementName());
+        if (resourceSet == null) {
+            LOG.info("RESOURCE SET: null");
+            return;
+        }
+        LOG.info("RESOURCE SET: " + resourceSet.eAdapters().size()
+                + " eAdapters");
+        for (final Adapter a : resourceSet.eAdapters()) {
+            LOG.info("ADAPTER: " + a);
+            if (a instanceof JavaClasspath) {
+                final JavaClasspath cp = (JavaClasspath) a;
+                final Map<String, List<String>> pcMap = cp
+                        .getPackageClassifierMap();
+                LOG.info("JavaClasspath: " + pcMap.size() + " keys");
+                final Iterator<String> it = pcMap.keySet().iterator();
+                while (it.hasNext()) {
+                    final String key = it.next();
+                    if (!(key.startsWith("java.") || key.startsWith("javax.")
+                            || key.startsWith("com.") || key.startsWith("sun.")
+                            || key.startsWith("org.jcp.")
+                            || key.startsWith("org.w3c.")
+                            || key.startsWith("org.omg.")
+                            || key.startsWith("org.xml.")
+                            || key.startsWith("org.ietf.")
+                            || key.startsWith("sunw.") || key
+                                .startsWith("zkasig."))) {
+                        final StringBuilder sb = new StringBuilder(key + ": ");
+                        final List<String> values = pcMap.get(key);
+                        for (int i = 0; i < values.size(); i++) {
+                            if (i > 0) {
+                                sb.append(", ");
+                            }
+                            sb.append("[" + i + "]=" + values.get(i));
+                        }
+                        LOG.info("CP KEY: " + sb.toString());
+                    }                    
+                }
+            }
+        }
+    }
+   // @formatter:on
 
 }

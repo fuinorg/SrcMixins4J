@@ -21,10 +21,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.EList;
@@ -34,7 +32,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.emftext.language.java.JavaClasspath;
 import org.emftext.language.java.annotations.AnnotationInstance;
 import org.emftext.language.java.annotations.AnnotationParameter;
 import org.emftext.language.java.annotations.AnnotationValue;
