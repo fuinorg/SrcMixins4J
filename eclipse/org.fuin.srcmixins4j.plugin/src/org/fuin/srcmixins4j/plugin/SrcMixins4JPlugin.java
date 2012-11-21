@@ -29,47 +29,56 @@ import org.eclipse.jdt.core.JavaCore;
 import org.emftext.language.java.JavaClasspath;
 import org.emftext.language.java.resource.java.IJavaOptions;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles mixin source code generation in Eclipse.
  */
 public final class SrcMixins4JPlugin extends Plugin {
 
+    private static final Logger LOG = LoggerFactory
+            .getLogger(SrcMixins4JPlugin.class);
+
     private static SrcMixins4JPlugin plugin;
 
     private ResourceSet resourceSet = null;
 
     private IElementChangedListener cpChangeListener;
-    
+
     private IJavaProject currentProject = null;
 
     @Override
     public final void start(final BundleContext context) throws Exception {
         super.start(context);
+        LOG.trace("BEGIN start(BundleContext");
         plugin = this;
         cpChangeListener = new IElementChangedListener() {
             @Override
             public void elementChanged(final ElementChangedEvent event) {
                 final IJavaElementDelta delta = event.getDelta();
-                if ((delta.getFlags() & IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED) != 0) { 
+                if ((delta.getFlags() & IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED) != 0) {
                     resetClasspath();
                 }
-            }        
+            }
         };
         JavaCore.addElementChangedListener(cpChangeListener);
+        LOG.trace("END start(BundleContext");
     }
 
     @Override
     public final void stop(final BundleContext context) throws Exception {
+        LOG.trace("BEGIN stop(BundleContext");
         JavaCore.removeElementChangedListener(cpChangeListener);
         plugin = null;
         cpChangeListener = null;
         super.stop(context);
+        LOG.trace("END stop(BundleContext");
     }
 
     /**
      * Returns the plugin itself.
-     *
+     * 
      * @return Plugin.
      */
     public static SrcMixins4JPlugin getDefault() {
@@ -79,16 +88,20 @@ public final class SrcMixins4JPlugin extends Plugin {
     /**
      * Returns a resource set for a given project. The resource set is cached
      * until a resource set for another class path is requested.
-     *
+     * 
      * @param project
      *            Project to return a resource set for.
-     *
+     * 
      * @return Resource set.
      */
     public final ResourceSet getResourceSet(final IJavaProject project) {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN getResourceSet(IJavaProject");
+            LOG.trace("project: " + project.getElementName());
+        }
 
         if (resourceSet == null) {
-            System.out.println("Create new ResourceSet");
+            LOG.info("Create new ResourceSet");
             resourceSet = new ResourceSetImpl();
             resourceSet.getLoadOptions().put(
                     IJavaOptions.DISABLE_CREATING_MARKERS_FOR_PROBLEMS,
@@ -96,13 +109,16 @@ public final class SrcMixins4JPlugin extends Plugin {
         }
 
         if (!project.equals(currentProject)) {
-            System.out.println("project != currentProject [project="
-                    + asString(project) + ", currentProject="
-                    + asString(currentProject) + "]");
+            LOG.info("project != currentProject [project=" + asString(project)
+                    + ", currentProject=" + asString(currentProject) + "]");
             resetClasspath();
         }
         currentProject = project;
 
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("resourceSet: " + resourceSet);
+            LOG.trace("END getResourceSet(IJavaProject");
+        }
         return resourceSet;
     }
 
@@ -118,12 +134,15 @@ public final class SrcMixins4JPlugin extends Plugin {
      * Reset the cached class path.
      */
     public final void resetClasspath() {
+        LOG.trace("BEGIN resetClasspath()");
         for (Adapter a : resourceSet.eAdapters()) {
             if (a instanceof JavaClasspath) {
                 resourceSet.eAdapters().remove(a);
+                LOG.trace("removed: " + a);
                 break;
             }
         }
+        LOG.trace("END resetClasspath()");
     }
 
 }

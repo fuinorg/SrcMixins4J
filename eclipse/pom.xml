@@ -99,9 +99,6 @@
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>target-platform-configuration</artifactId>
                 <version>${tycho-version}</version>
-                <configuration>
-                    <pomDependencies>consider</pomDependencies>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -125,26 +122,21 @@
     <repositories>
 
         <repository>
-            <id>mvn.emftext.org</id>
-            <url>http://emftext.org/maven-repository/</url>
-        </repository>
-
-        <repository>
             <id>eclipse-indigo</id>
             <layout>p2</layout>
             <url>http://download.eclipse.org/releases/indigo</url>
         </repository>
 
         <repository>
-            <id>p2.emftext.org</id>
+            <id>P2 emftext.org</id>
             <layout>p2</layout>
             <url>http://emftext.org/update_trunk</url>
         </repository>
 
         <repository>
-            <id>fuin.org</id>
-            <name>Repository at fuin.org</name>
-            <url>http://www.fuin.org/maven-repository</url>
+            <id>P2 fuin.org</id>
+            <layout>p2</layout>
+            <url>http://www.fuin.org/p2-repository/libraries</url>
         </repository>
 
     </repositories>
