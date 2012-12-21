@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
  * Base class for mixin tests.
  */
 public abstract class AbstractSrcMixins4JTest {
-
+    
     @BeforeClass
     public static void beforeClass() throws IOException {
         JaMoPPUtil.initialize();
