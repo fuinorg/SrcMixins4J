@@ -49,7 +49,9 @@ public final class SrcMixins4JAnalyzerMapLog implements SrcMixins4JAnalyzerLog {
             messages = new ArrayList<String>();
             warnings.put(classifier, messages);
         }
-        messages.add(message);
+        if (!messages.contains(message)) {
+            messages.add(message);
+        }
     }
 
     @Override
@@ -59,7 +61,9 @@ public final class SrcMixins4JAnalyzerMapLog implements SrcMixins4JAnalyzerLog {
             messages = new ArrayList<String>();
             errors.put(classifier, messages);
         }
-        messages.add(message);
+        if (!messages.contains(message)) {
+            messages.add(message);
+        }
     }
     
     /**
