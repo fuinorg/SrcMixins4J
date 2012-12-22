@@ -58,7 +58,7 @@ public final class MavenLoggerFactory implements ILoggerFactory {
      */
     @Override
     public Logger getLogger(final String name) {
-        return this.LOGGER;
+        return LOGGER;
     }
 
 }

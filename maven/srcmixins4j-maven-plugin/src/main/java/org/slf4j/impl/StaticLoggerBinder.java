@@ -51,7 +51,6 @@ public final class StaticLoggerBinder implements LoggerFactoryBinder {
      * Declare the version of the SLF4J API this implementation is compiled
      * against. The value of this field is usually modified with each release.
      */
-    @SuppressWarnings("PMD.LongVariable")
     public static final String REQUESTED_API_VERSION = "1.6";
 
     /**

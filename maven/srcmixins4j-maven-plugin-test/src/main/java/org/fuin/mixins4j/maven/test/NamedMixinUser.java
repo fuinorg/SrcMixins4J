@@ -2,7 +2,8 @@ package org.fuin.mixins4j.maven.test;
 
 import org.fuin.srcmixins4j.annotations.MixinGenerated;
 
-public class NamedMixinUser implements NamedMixin<String> {
+
+public class NamedMixinUser implements NamedMixin<String>, DuplicateNamedMixin {
 
 	@MixinGenerated(NamedMixinProvider.class)
 	private String name;

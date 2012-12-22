@@ -20,7 +20,9 @@ package org.fuin.srcmixins4j.maven;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -33,6 +35,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.emftext.language.java.JavaClasspath;
+import org.emftext.language.java.classifiers.Classifier;
 import org.emftext.language.java.resource.JaMoPPUtil;
 import org.fuin.srcmixins4j.core.SrcMixins4JAnalyzer;
 import org.fuin.srcmixins4j.core.SrcMixins4JAnalyzerFileContext;
@@ -81,8 +84,38 @@ public final class SrcMixins4JMojo extends AbstractMojo {
         registerJarFiles(resourceSet);
         final List<File> files = registerSourceDirectories(resourceSet);
 
-        new SrcMixins4JAnalyzer().analyze(new SrcMixins4JAnalyzerFileContext(
-                files, resourceSet));
+        final SrcMixins4JAnalyzerFileContext context = new SrcMixins4JAnalyzerFileContext(
+                files, resourceSet);
+        new SrcMixins4JAnalyzer().analyze(context);
+
+        // Log warnings
+        final Map<Classifier, List<String>> warnings = context.getWarnings();
+        if (warnings.size() > 0) {
+            final Iterator<Classifier> warnIt = warnings.keySet().iterator();
+            while (warnIt.hasNext()) {
+                final Classifier classifier = (Classifier) warnIt.next();
+                final List<String> messages = warnings.get(classifier);
+                for (final String message : messages) {
+                    LOG.warn(SrcMixins4JUtils.getFullQualifiedName(classifier)
+                            + ": " + message);
+                }
+            }
+        }
+
+        // Log errors and terminate build with error
+        final Map<Classifier, List<String>> errors = context.getErrors();
+        if (errors.size() > 0) {
+            final Iterator<Classifier> errorIt = errors.keySet().iterator();
+            while (errorIt.hasNext()) {
+                final Classifier classifier = (Classifier) errorIt.next();
+                final List<String> messages = errors.get(classifier);
+                for (final String message : messages) {
+                    LOG.error(SrcMixins4JUtils.getFullQualifiedName(classifier)
+                            + ": " + message);
+                }
+            }
+            throw new MojoExecutionException("Couldn't apply mixins - See error log for details");
+        }
 
     }
 

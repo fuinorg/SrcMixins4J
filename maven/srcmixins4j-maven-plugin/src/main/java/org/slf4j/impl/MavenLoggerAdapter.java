@@ -47,7 +47,6 @@ import org.slf4j.helpers.MessageFormatter;
  * @version $Id$
  * @see <a href="http://www.slf4j.org/faq.html#slf4j_compatible">SLF4J FAQ</a>
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public final class MavenLoggerAdapter extends MarkerIgnoringBase {
 
     /**
