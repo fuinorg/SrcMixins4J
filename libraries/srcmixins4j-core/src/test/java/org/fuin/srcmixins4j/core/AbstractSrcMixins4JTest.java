@@ -30,6 +30,7 @@ import org.junit.BeforeClass;
 /**
  * Base class for mixin tests.
  */
+//CHECKSTYLE:OFF
 public abstract class AbstractSrcMixins4JTest {
     
     @BeforeClass
@@ -67,3 +68,4 @@ public abstract class AbstractSrcMixins4JTest {
     }
 
 }
+//CHECKSTYLE:ON

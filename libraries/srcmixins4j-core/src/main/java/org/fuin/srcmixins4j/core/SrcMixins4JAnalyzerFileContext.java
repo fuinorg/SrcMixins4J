@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.eclipse.emf.common.util.URI;
@@ -28,6 +29,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.emftext.language.java.annotations.AnnotationInstance;
 import org.emftext.language.java.classifiers.Class;
+import org.emftext.language.java.classifiers.Classifier;
 import org.emftext.language.java.classifiers.Interface;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
 
@@ -45,6 +47,8 @@ public final class SrcMixins4JAnalyzerFileContext implements
     private final List<File> updated;
 
     private final List<Class> mixinProviders;
+
+    private final SrcMixins4JAnalyzerMapLog analyzerLog;
 
     private int idx = -1;
 
@@ -70,6 +74,7 @@ public final class SrcMixins4JAnalyzerFileContext implements
         this.filesToInspect = filesToInspect;
         this.resourceSet = resourceSet;
         this.updated = new ArrayList<File>();
+        this.analyzerLog = new SrcMixins4JAnalyzerMapLog();
         this.mixinProviders = SrcMixins4JUtils.findMixinProviders(resourceSet);
     }
 
@@ -111,7 +116,7 @@ public final class SrcMixins4JAnalyzerFileContext implements
                     .getAnnotationInstance(mixinProvider,
                             MixinProvider.class.getName());
             final Interface intf = SrcMixins4JUtils
-                    .getSingleAnnotationInterfaceParameter(ai);
+                    .getSingleAnnotationRefElementParameter(ai, Interface.class);
             if (intf == mixinIntf) {
                 return mixinProvider;
             }
@@ -122,6 +127,35 @@ public final class SrcMixins4JAnalyzerFileContext implements
     @Override
     public final List<Class> findMixinUsers(final Interface mixinIntf) {
         return SrcMixins4JUtils.findImplementors(resourceSet, mixinIntf);
+    }
+
+    @Override
+    public final void addWarning(final Classifier classifier,
+            final String message) {
+        analyzerLog.addWarning(classifier, message);
+    }
+
+    @Override
+    public final void addError(final Classifier classifier, final String message) {
+        analyzerLog.addError(classifier, message);
+    }
+
+    /**
+     * Returns the map of warnings.
+     * 
+     * @return Map with classifiers that have one or more warnings attached.
+     */
+    public final Map<Classifier, List<String>> getWarnings() {
+        return analyzerLog.getWarnings();
+    }
+
+    /**
+     * Returns the map of errors.
+     * 
+     * @return Map with classifiers that have one or more errors attached.
+     */
+    public final Map<Classifier, List<String>> getErrors() {
+        return analyzerLog.getErrors();
     }
 
     /**

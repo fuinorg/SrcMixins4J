@@ -155,14 +155,49 @@ public final class SrcMixins4JUtils {
 
     /**
      * Returns the "value()" from an annotation that has only a single parameter
-     * of type annotation.
+     * of type interface.
+     * 
+     * @param annotationInstance
+     *            Annotation instance to return the value from.
+     * @param targetClass
+     *            Type of the referenced element to find.
+     * 
+     * @return Interface or NULL if the annotation has no parameter at all, more
+     *         than one parameter or it's not type interface.
+     * 
+     * @param <TARGET>
+     *            Returned type.
+     */
+    @SuppressWarnings("unchecked")
+    public static <TARGET extends ReferenceableElement> TARGET getSingleAnnotationRefElementParameter(
+            final AnnotationInstance annotationInstance,
+            final java.lang.Class<TARGET> targetClass) {
+
+        assertArgNotNull("annotationInstance", annotationInstance);
+        assertNoProxy(annotationInstance);
+
+        final AnnotationValue value = getSingleAnnotationParameterValue(annotationInstance);
+        if (value instanceof IdentifierReference) {
+            final IdentifierReference ir = (IdentifierReference) value;
+            final ReferenceableElement target = ir.getTarget();
+            if (targetClass.isAssignableFrom(target.getClass())) {
+                return (TARGET) target;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the "value()" from an annotation that has only a single
+     * parameter.
      * 
      * @param annotationInstance
      *            Annotation instance to return the value from.
      * 
-     * @return Interface.
+     * @return The value or NULL if the annotation has no parameter at all or
+     *         more than one parameter.
      */
-    public static Interface getSingleAnnotationInterfaceParameter(
+    public static AnnotationValue getSingleAnnotationParameterValue(
             final AnnotationInstance annotationInstance) {
 
         assertArgNotNull("annotationInstance", annotationInstance);
@@ -171,14 +206,7 @@ public final class SrcMixins4JUtils {
         final AnnotationParameter param = annotationInstance.getParameter();
         if (param instanceof SingleAnnotationParameter) {
             final SingleAnnotationParameter sap = (SingleAnnotationParameter) param;
-            final AnnotationValue value = sap.getValue();
-            if (value instanceof IdentifierReference) {
-                final IdentifierReference ir = (IdentifierReference) value;
-                final ReferenceableElement target = ir.getTarget();
-                if (target instanceof Interface) {
-                    return (Interface) target;
-                }
-            }
+            return sap.getValue();
         }
         return null;
     }
@@ -205,7 +233,7 @@ public final class SrcMixins4JUtils {
         if (ai == null) {
             return null;
         }
-        return getSingleAnnotationInterfaceParameter(ai);
+        return getSingleAnnotationRefElementParameter(ai, Interface.class);
 
     }
 
@@ -251,22 +279,26 @@ public final class SrcMixins4JUtils {
      *            Class with fields and methods to copy.
      * @param mixinInterface
      *            Mixin interface.
+     * @param log
+     *            Log for errors or warnings.
      */
     public static void applyMixin(final Class mixinUser,
-            final Class mixinProvider, final Interface mixinInterface) {
+            final Class mixinProvider, final Interface mixinInterface,
+            final SrcMixins4JAnalyzerLog log) {
 
         assertArgNotNull("mixinUser", mixinUser);
         assertArgNotNull("mixinProvider", mixinProvider);
         assertArgNotNull("mixinInterface", mixinInterface);
+        assertArgNotNull("log", log);
         assertNoProxy(mixinUser);
         assertNoProxy(mixinProvider);
         assertNoProxy(mixinInterface);
 
         final List<Field> fieldsToAdd = createListOfFieldsToAdd(mixinUser,
-                mixinProvider);
+                mixinProvider, log);
 
         final List<Method> methodsToAdd = createListOfMethodsToAdd(mixinUser,
-                mixinProvider);
+                mixinProvider, log);
 
         if ((fieldsToAdd.size() > 0) || (methodsToAdd.size() > 0)) {
 
@@ -314,25 +346,44 @@ public final class SrcMixins4JUtils {
      *            User to add fields to.
      * @param mixinProvider
      *            Provider with fields to copy.
+     * @param log
+     *            Log for errors or warnings.
      * 
      * @return List of fields that are in the provider but not in the user
      *         class.
      */
     private static List<Field> createListOfFieldsToAdd(final Class mixinUser,
-            final Class mixinProvider) {
+            final Class mixinProvider, final SrcMixins4JAnalyzerLog log) {
 
         final List<Field> fieldsToAdd = new ArrayList<Field>();
         final List<Field> providerFields = mixinProvider.getFields();
-        for (final Field field : providerFields) {
+        for (final Field providerField : providerFields) {
 
-            final boolean userHasAlreadySameField = findFieldByName(mixinUser,
-                    field.getName()) != null;
-            final boolean fieldHasMixinGeneratedAnnotation = getAnnotationInstance(
-                    field, MixinGenerated.class.getName()) != null;
+            final Field userField = findFieldByName(mixinUser,
+                    providerField.getName());
+            final Class existingProviderClass = getProviderClass(userField);
+            final boolean userHasAlreadySameField = userField != null;
+            if (userHasAlreadySameField && (existingProviderClass != null)
+                    && (existingProviderClass != mixinProvider)) {
 
-            if (fieldHasMixinGeneratedAnnotation && !userHasAlreadySameField) {
-                fieldsToAdd.add(field);
+                log.addError(mixinUser, "Field '" + userField.getName()
+                        + "' provided by more than one mixin: "
+                        + getFullQualifiedName(mixinProvider) + " / "
+                        + getFullQualifiedName(existingProviderClass));
+
+            } else {
+
+                final AnnotationInstance providerAI = getAnnotationInstance(
+                        providerField, MixinGenerated.class.getName());
+                final boolean providerFieldHasMixinGeneratedAnnotation = providerAI != null;
+
+                if (providerFieldHasMixinGeneratedAnnotation
+                        && !userHasAlreadySameField) {
+                    fieldsToAdd.add(providerField);
+                }
+
             }
+
         }
         return fieldsToAdd;
 
@@ -346,29 +397,137 @@ public final class SrcMixins4JUtils {
      *            User to add methods to.
      * @param mixinProvider
      *            Provider with methods to copy.
+     * @param log
+     *            Log for errors or warnings.
      * 
      * @return List of methods that are in the provider but not in the user
      *         class.
      */
     private static List<Method> createListOfMethodsToAdd(final Class mixinUser,
-            final Class mixinProvider) {
+            final Class mixinProvider, final SrcMixins4JAnalyzerLog log) {
 
         final List<Method> methodsToAdd = new ArrayList<Method>();
         final List<Method> providerMethods = mixinProvider.getMethods();
-        for (final Method method : providerMethods) {
+        for (final Method providerMethod : providerMethods) {
 
-            final boolean userHasAlreadySameMethod = findMethodBySignature(
-                    mixinUser, method.getName(), method.getParameters()) != null;
-            final boolean methodHasMixinGeneratedAnnotation = getAnnotationInstance(
-                    method, MixinGenerated.class.getName()) != null;
+            final Method userMethod = findMethodBySignature(mixinUser,
+                    providerMethod.getName(), providerMethod.getParameters());
+            final Class existingProviderClass = getProviderClass(userMethod);
+            final boolean userHasAlreadySameMethod = userMethod != null;
+            if (userHasAlreadySameMethod && (existingProviderClass != null)
+                    && (existingProviderClass != mixinProvider)) {
 
-            if (methodHasMixinGeneratedAnnotation && !userHasAlreadySameMethod) {
-                methodsToAdd.add(method);
+                log.addError(mixinUser, "Method '"
+                        + getSignatureString(userMethod)
+                        + "' provided by more than one mixin: "
+                        + getFullQualifiedName(mixinProvider) + " / "
+                        + getFullQualifiedName(existingProviderClass));
+
+            } else {
+
+                final AnnotationInstance providerAI = getAnnotationInstance(
+                        providerMethod, MixinGenerated.class.getName());
+                final boolean methodHasMixinGeneratedAnnotation = providerAI != null;
+
+                if (methodHasMixinGeneratedAnnotation
+                        && !userHasAlreadySameMethod) {
+                    methodsToAdd.add(providerMethod);
+                }
+
             }
 
         }
         return methodsToAdd;
 
+    }
+
+    /**
+     * Returns the signature of the given method as string.
+     * 
+     * @param method Method to return the signature string for.
+     * 
+     * @return Text representation of the method containing name and parameter types.
+     */
+    public static String getSignatureString(final Method method) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getTypeName(method.getTypeReference().getTarget()));
+        sb.append(" ");
+        sb.append(method.getName());
+        sb.append("(");
+        final List<Parameter> params = method.getParameters();
+        for (int i = 0; i < params.size(); i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            final Parameter param = params.get(i);
+            final Type type = param.getTypeReference().getTarget();
+            sb.append(getTypeName(type));
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    // CHECKSTYLE:OFF Cyclomatic complexity is not nice, but OK here...
+    // TODO Should be in JaMoPP code base method of 'Type'...
+    private static String getTypeName(final Type type) {
+        if (type instanceof PrimitiveType) {
+            if (type instanceof org.emftext.language.java.types.Boolean) {
+                return "boolean";
+            } else if (type instanceof org.emftext.language.java.types.Byte) {
+                return "byte";
+            } else if (type instanceof org.emftext.language.java.types.Char) {
+                return "char";
+            } else if (type instanceof org.emftext.language.java.types.Double) {
+                return "double";
+            } else if (type instanceof org.emftext.language.java.types.Float) {
+                return "float";
+            } else if (type instanceof org.emftext.language.java.types.Int) {
+                return "int";
+            } else if (type instanceof org.emftext.language.java.types.Long) {
+                return "long";
+            } else if (type instanceof org.emftext.language.java.types.Short) {
+                return "short";
+            } else if (type instanceof org.emftext.language.java.types.Void) {
+                return "void";
+            }
+        } else if (type instanceof Classifier) {
+            final Classifier classifier = (Classifier) type;
+            final String name = getFullQualifiedName(classifier);
+            if (name.equals("java.lang.String")) {
+                return "String";
+            }
+            return name;
+        } else if (type instanceof AnonymousClass) {
+            final AnonymousClass clasz = (AnonymousClass) type;
+            // TODO Find better way to display anonymous class
+            return clasz.toString();
+        }
+        throw new IllegalStateException("Unknown type: " + type);
+    }
+    // CHECKSTYLE:ON
+    
+    
+    /**
+     * Returns the provider class value from a {@link MixinGenerated}
+     * annotation.
+     * 
+     * @param annotableAndModifiable
+     *            Field or method that may have a {@link MixinGenerated}
+     *            annotation.
+     * 
+     * @return Mixin provider class or NULL if the annotation is not present.
+     */
+    public static Class getProviderClass(
+            final AnnotableAndModifiable annotableAndModifiable) {
+        if (annotableAndModifiable == null) {
+            return null;
+        }
+        final AnnotationInstance userAI = getAnnotationInstance(
+                annotableAndModifiable, MixinGenerated.class.getName());
+        if (userAI == null) {
+            return null;
+        }
+        return getSingleAnnotationRefElementParameter(userAI, Class.class);
     }
 
     /**
@@ -1003,16 +1162,21 @@ public final class SrcMixins4JUtils {
     /**
      * Loads all resources in a directory and it's sub directories.
      * 
-     * @param resourceSet Resource set to use.
-     * @param dir Directory to parse.
+     * @param resourceSet
+     *            Resource set to use.
+     * @param dir
+     *            Directory to parse.
      * 
-     * @throws IOException Error parsing the resources.
+     * @throws IOException
+     *             Error parsing the resources.
      */
-    public static void loadResources(final ResourceSet resourceSet, final File dir) throws IOException {
+    public static void loadResources(final ResourceSet resourceSet,
+            final File dir) throws IOException {
         final File[] files = dir.listFiles();
         for (final File file : files) {
             if (file.isFile()) {
-                resourceSet.getResource(URI.createFileURI(file.getCanonicalPath()), true);
+                resourceSet.getResource(
+                        URI.createFileURI(file.getCanonicalPath()), true);
             } else {
                 loadResources(resourceSet, file);
             }
@@ -1020,23 +1184,25 @@ public final class SrcMixins4JUtils {
     }
 
     /**
-     * Returns a list of all java files in a directory and it's sub directories..
+     * Returns a list of all java files in a directory and it's sub
+     * directories..
      * 
-     * @param dir Directory to scan for java files.
+     * @param dir
+     *            Directory to scan for java files.
      * 
      * @return List of all java files.
      */
     public static List<File> findRecursiveAllJavaFiles(final File dir) {
 
         final List<File> files = new ArrayList<File>();
-        
+
         final File[] found = dir.listFiles(new FileFilter() {
             @Override
-            public final boolean accept(final File file) {                
+            public final boolean accept(final File file) {
                 return file.isDirectory() || file.getName().endsWith(".java");
             }
         });
-        
+
         for (final File file : found) {
             if (file.isDirectory()) {
                 files.addAll(findRecursiveAllJavaFiles(file));
@@ -1044,9 +1210,9 @@ public final class SrcMixins4JUtils {
                 files.add(file);
             }
         }
-        
+
         return files;
-        
+
     }
-    
+
 }

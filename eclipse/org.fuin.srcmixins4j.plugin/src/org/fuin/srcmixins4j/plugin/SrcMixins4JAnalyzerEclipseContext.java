@@ -39,9 +39,12 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.emftext.language.java.annotations.AnnotationInstance;
 import org.emftext.language.java.classifiers.Class;
+import org.emftext.language.java.classifiers.Classifier;
 import org.emftext.language.java.classifiers.ConcreteClassifier;
 import org.emftext.language.java.classifiers.Interface;
+import org.emftext.language.java.resource.java.JavaEProblemType;
 import org.emftext.language.java.resource.java.mopp.JavaMarkerHelper;
+import org.emftext.language.java.resource.java.mopp.JavaResource;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
 import org.fuin.srcmixins4j.core.SrcMixins4JAnalyzerContext;
 import org.fuin.srcmixins4j.core.SrcMixins4JUtils;
@@ -50,7 +53,8 @@ import org.fuin.srcmixins4j.core.SrcMixins4JUtils;
  * Context used in Eclipse when analyzing source files to apply or remove mixin
  * code.
  */
-public final class SrcMixins4JAnalyzerEclipseContext implements SrcMixins4JAnalyzerContext {
+public final class SrcMixins4JAnalyzerEclipseContext implements
+        SrcMixins4JAnalyzerContext {
 
     private final IJavaProject project;
 
@@ -127,7 +131,7 @@ public final class SrcMixins4JAnalyzerEclipseContext implements SrcMixins4JAnaly
         if (mixinIntf == null) {
             throw new IllegalArgumentException("mixinIntf == null");
         }
-        
+
         final SearchPattern mixinImpl = SearchPattern.createPattern(
                 MixinProvider.class.getName(),
                 IJavaSearchConstants.ANNOTATION_TYPE,
@@ -144,7 +148,8 @@ public final class SrcMixins4JAnalyzerEclipseContext implements SrcMixins4JAnaly
                         .getAnnotationInstance(clasz,
                                 MixinProvider.class.getName());
                 final Interface intf = SrcMixins4JUtils
-                        .getSingleAnnotationInterfaceParameter(ai);
+                        .getSingleAnnotationRefElementParameter(ai,
+                                Interface.class);
                 if (intf == mixinIntf) {
                     return clasz;
                 }
@@ -153,7 +158,6 @@ public final class SrcMixins4JAnalyzerEclipseContext implements SrcMixins4JAnaly
         return null;
 
     }
-
 
     @Override
     public final List<Class> findMixinUsers(final Interface mixinIntf) {
@@ -180,7 +184,19 @@ public final class SrcMixins4JAnalyzerEclipseContext implements SrcMixins4JAnaly
         }
         return list;
     }
+
+    @Override
+    public final void addWarning(final Classifier classifier, final String message) {
+        ((JavaResource) classifier.eResource()).addWarning(message,
+                JavaEProblemType.BUILDER_ERROR, classifier);
+    }
     
+    @Override
+    public final void addError(final Classifier classifier, final String message) {
+        ((JavaResource) classifier.eResource()).addError(message,
+                JavaEProblemType.BUILDER_ERROR, classifier);
+    }
+
     /**
      * Locates all source types of a given pattern.
      * 

@@ -27,8 +27,6 @@ import org.emftext.language.java.classifiers.Class;
 import org.emftext.language.java.classifiers.ConcreteClassifier;
 import org.emftext.language.java.classifiers.Interface;
 import org.emftext.language.java.containers.CompilationUnit;
-import org.emftext.language.java.resource.java.JavaEProblemType;
-import org.emftext.language.java.resource.java.mopp.JavaResource;
 import org.fuin.srcmixins4j.annotations.MixinIntf;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
 import org.slf4j.Logger;
@@ -154,10 +152,9 @@ public final class SrcMixins4JAnalyzer {
         if (mixinIntf == null) {
             // Should never happen because @MixinProvider has no default
             // parameter value
-            ((JavaResource) clasz.eResource()).addWarning(
-                    "No mixin interface class found in mixin provider",
-                    JavaEProblemType.BUILDER_ERROR, clasz);
-            return;
+            throw new IllegalStateException(
+                    "Couldn't find the mixin interface for provider: "
+                            + clasz.getName());
         }
         final List<Class> mixinUsers = context.findMixinUsers(mixinIntf);
         for (final Class mixinUser : mixinUsers) {
@@ -211,7 +208,7 @@ public final class SrcMixins4JAnalyzer {
             final Class provider = context.findMixinProvider(mixinIntf);
             if (provider != null) {
                 LOG.info(" implemented by " + provider.getName());
-                SrcMixins4JUtils.applyMixin(clasz, provider, mixinIntf);
+                SrcMixins4JUtils.applyMixin(clasz, provider, mixinIntf, context);
             }
         }
 

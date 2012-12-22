@@ -28,7 +28,7 @@ import org.emftext.language.java.classifiers.Interface;
 /**
  * Context used when analyzing source files to apply or remove mixin code.
  */
-public interface SrcMixins4JAnalyzerContext {
+public interface SrcMixins4JAnalyzerContext extends SrcMixins4JAnalyzerLog {
 
     /**
      * Returns the current resource set.

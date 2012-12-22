@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -49,7 +50,9 @@ import org.emftext.language.java.types.Type;
 import org.fuin.srcmixins4j.annotations.MixinGenerated;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
 import org.fuin.srcmixins4j.core.SrcMixins4JUtils.TypeParam2Type;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -109,6 +112,26 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
             "TestGenericMixinUser2.java");
     private static Class testGenericMixinUser2Classifier;
 
+    // Duplicate
+    private static File DUPLICATE_INTF = new File(RES_DIR, "DuplicateIntf.java");
+    private static ConcreteClassifier duplicateIntfClassifier;
+
+    private static File DUPLICATE_MIXIN_INTF = new File(RES_DIR,
+            "DuplicateMixinIntf.java");
+    private static Interface duplicateMixinIntfClassifier;
+
+    private static File DUPLICATE_MIXIN_PROVIDER = new File(RES_DIR,
+            "DuplicateMixinProvider.java");
+    private static Class duplicateMixinProviderClassifier;
+
+    private static File DUPLICATE_MIXIN_USER = new File(RES_DIR,
+            "DuplicateMixinUser.java");
+    private static Class duplicateMixinUserClassifier;
+
+    // Instance variables
+
+    private SrcMixins4JAnalyzerMapLog analyzerLog;
+
     @BeforeClass
     public static void beforeClass() throws IOException {
 
@@ -117,30 +140,75 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
 
         testIntfClassifier = loadClassifier(resourceSet, TEST_INTF);
         testMixinIntfClassifier = loadClassifier(resourceSet, TEST_MIXIN_INTF);
-        testMixinProviderClassifier = loadClassifier(resourceSet, TEST_MIXIN_PROVIDER);
+        testMixinProviderClassifier = loadClassifier(resourceSet,
+                TEST_MIXIN_PROVIDER);
         testMixinUserClassifier = loadClassifier(resourceSet, TEST_MIXIN_USER);
         testMixinUser2Classifier = loadClassifier(resourceSet, TEST_MIXIN_USER2);
 
-        testGenericIntfClassifier = loadClassifier(resourceSet, TEST_GENERIC_INTF);
-        testGenericMixinIntfClassifier = loadClassifier(resourceSet, TEST_GENERIC_MIXIN_INTF);
-        testGenericMixinProviderClassifier = loadClassifier(resourceSet, TEST_GENERIC_MIXIN_PROVIDER);
-        testGenericMixinUserClassifier = loadClassifier(resourceSet, TEST_GENERIC_MIXIN_USER);
-        testGenericMixinUser2Classifier = loadClassifier(resourceSet, TEST_GENERIC_MIXIN_USER2);
+        testGenericIntfClassifier = loadClassifier(resourceSet,
+                TEST_GENERIC_INTF);
+        testGenericMixinIntfClassifier = loadClassifier(resourceSet,
+                TEST_GENERIC_MIXIN_INTF);
+        testGenericMixinProviderClassifier = loadClassifier(resourceSet,
+                TEST_GENERIC_MIXIN_PROVIDER);
+        testGenericMixinUserClassifier = loadClassifier(resourceSet,
+                TEST_GENERIC_MIXIN_USER);
+        testGenericMixinUser2Classifier = loadClassifier(resourceSet,
+                TEST_GENERIC_MIXIN_USER2);
 
         testClassA = loadClassifier(resourceSet, TEST_CLASS_A);
+
+        duplicateIntfClassifier = loadClassifier(resourceSet, DUPLICATE_INTF);
+        duplicateMixinIntfClassifier = loadClassifier(resourceSet,
+                DUPLICATE_MIXIN_INTF);
+        duplicateMixinProviderClassifier = loadClassifier(resourceSet,
+                DUPLICATE_MIXIN_PROVIDER);
+        duplicateMixinUserClassifier = loadClassifier(resourceSet,
+                DUPLICATE_MIXIN_USER);
 
     }
 
     @AfterClass
     public static void afterClass() {
         resourceSet = null;
+
+        testIntfClassifier = null;
+        testMixinIntfClassifier = null;
+        testMixinProviderClassifier = null;
+        testMixinUserClassifier = null;
+        testMixinUser2Classifier = null;
+
+        testGenericIntfClassifier = null;
+        testGenericMixinIntfClassifier = null;
+        testGenericMixinProviderClassifier = null;
+        testGenericMixinUserClassifier = null;
+        testGenericMixinUser2Classifier = null;
+
+        testClassA = null;
+
+        duplicateIntfClassifier = null;
+        duplicateMixinIntfClassifier = null;
+        duplicateMixinProviderClassifier = null;
+        duplicateMixinUserClassifier = null;
     }
 
-    private static Resource loadResource(final ResourceSet set, final File file) throws IOException {
+    @Before
+    public void before() {
+        analyzerLog = new SrcMixins4JAnalyzerMapLog();
+    }
+
+    @After
+    public void after() {
+        analyzerLog = null;
+    }
+
+    private static Resource loadResource(final ResourceSet set, final File file)
+            throws IOException {
         return loadResource(set, URI.createFileURI(file.getCanonicalPath()));
     }
 
-    private static Resource loadResource(final ResourceSet set, final URI uri) throws IOException {
+    private static Resource loadResource(final ResourceSet set, final URI uri)
+            throws IOException {
         final Resource resource = set.getResource(uri, true);
         assertThat(resource).isNotNull();
         return resource;
@@ -149,10 +217,10 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
     private static File saveToTempFile(final Resource res) {
         try {
             final File tmpFile = File.createTempFile("tmp-", ".java");
-            tmpFile.deleteOnExit();
+            // tmpFile.deleteOnExit();
             final FileOutputStream fos = new FileOutputStream(tmpFile);
             try {
-                testGenericMixinUserClassifier.eResource().save(fos, null);
+                res.save(fos, null);
                 return tmpFile;
             } finally {
                 fos.close();
@@ -163,8 +231,8 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Classifier> T loadClassifier(final ResourceSet set, final File file)
-            throws IOException {
+    private static <T extends Classifier> T loadClassifier(
+            final ResourceSet set, final File file) throws IOException {
 
         final Resource resource = loadResource(set, file);
         final CompilationUnit compilationUnit = SrcMixins4JUtils
@@ -211,7 +279,7 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
 
         // TEST
         final Interface intf = SrcMixins4JUtils
-                .getSingleAnnotationInterfaceParameter(ai);
+                .getSingleAnnotationRefElementParameter(ai, Interface.class);
 
         // VERIFY
         assertThat(intf).isNotNull();
@@ -249,9 +317,12 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
 
         // TEST APPLY
         SrcMixins4JUtils.applyMixin(testMixinUserClassifier,
-                testMixinProviderClassifier, testMixinIntfClassifier);
+                testMixinProviderClassifier, testMixinIntfClassifier,
+                analyzerLog);
 
         // VERIFY APPLY
+        assertThat(analyzerLog.getErrors()).isEmpty();
+        assertThat(analyzerLog.getWarnings()).isEmpty();
 
         assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isTrue();
@@ -322,9 +393,12 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
 
         // TEST APPLY
         SrcMixins4JUtils.applyMixin(testMixinUser2Classifier,
-                testMixinProviderClassifier, testMixinIntfClassifier);
+                testMixinProviderClassifier, testMixinIntfClassifier,
+                analyzerLog);
 
         // VERIFY nothing changed
+        assertThat(analyzerLog.getErrors()).isEmpty();
+        assertThat(analyzerLog.getWarnings()).isEmpty();
         assertThat(SrcMixins4JUtils.containsClassifierImport(cu, annotation))
                 .isFalse();
         assertHasFieldWithoutMixinGeneratedAnnotation(testMixinUser2Classifier,
@@ -628,7 +702,9 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
 
         SrcMixins4JUtils.applyMixin(testGenericMixinUserClassifier,
                 testGenericMixinProviderClassifier,
-                testGenericMixinIntfClassifier);
+                testGenericMixinIntfClassifier, analyzerLog);
+        assertThat(analyzerLog.getErrors()).isEmpty();
+        assertThat(analyzerLog.getWarnings()).isEmpty();
 
         final File expected = new File(
                 "src/test/TestApplyGenericMixinResult.java");
@@ -651,11 +727,13 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
 
         // VERIFY
         assertThat(mixinProviders).isNotNull();
-        assertThat(mixinProviders).hasSize(2);
+        assertThat(mixinProviders).hasSize(3);
         assertThat(mixinProviders.get(0).getName()).isEqualTo(
                 "TestMixinProvider");
         assertThat(mixinProviders.get(1).getName()).isEqualTo(
                 "TestGenericMixinProvider");
+        assertThat(mixinProviders.get(2).getName()).isEqualTo(
+                "DuplicateMixinProvider");
 
     }
 
@@ -668,9 +746,68 @@ public final class SrcMixins4JUtilsTest extends AbstractSrcMixins4JTest {
 
         // VERIFY
         assertThat(implementors).isNotNull();
-        assertThat(implementors).hasSize(2);
+        assertThat(implementors).hasSize(3);
         assertThat(implementors.get(0).getName()).isEqualTo("TestMixinUser");
         assertThat(implementors.get(1).getName()).isEqualTo("TestMixinUser2");
+        assertThat(implementors.get(2).getName()).isEqualTo(
+                "DuplicateMixinUser");
+
+    }
+
+    @Test
+    public final void testDuplicateMixinProvider() {
+
+        // PREPARE
+        final File expected = new File(
+                "src/test/resources/DuplicateMixinUser_AFTER.java");
+        final Map<Classifier, List<String>> errors = analyzerLog.getErrors();
+
+        // TEST
+
+        // Apply first mixin
+        SrcMixins4JUtils.applyMixin(duplicateMixinUserClassifier,
+                testMixinProviderClassifier, testMixinIntfClassifier,
+                analyzerLog);
+        assertThat(analyzerLog.getWarnings()).isEmpty();
+        assertThat(errors).isEmpty();
+
+        // Apply second mixin - Should result in error
+        SrcMixins4JUtils.applyMixin(duplicateMixinUserClassifier,
+                duplicateMixinProviderClassifier, duplicateMixinIntfClassifier,
+                analyzerLog);
+
+        // VERIFY
+        final File result = saveToTempFile(duplicateMixinUserClassifier
+                .eResource());
+        assertThat(analyzerLog.getWarnings()).isEmpty();
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(duplicateMixinUserClassifier)).hasSize(1);
+        assertThat(errors.get(duplicateMixinUserClassifier).get(0))
+                .isEqualTo(
+                        "Method 'String getXyz()' provided by more than one mixin: "
+                                + SrcMixins4JUtils
+                                        .getFullQualifiedName(duplicateMixinProviderClassifier)
+                                + " / "
+                                + SrcMixins4JUtils
+                                        .getFullQualifiedName(testMixinProviderClassifier));
+        assertThat(result).hasSameContentAs(expected);
+
+    }
+
+    @Test
+    public final void testGetSignatureString() {
+
+        // PREPARE
+        assertThat(testClassA.getMethods()).hasSize(4);
+        final Method method = testClassA.getMethods().get(3);
+
+        // TEST
+        final String signature = SrcMixins4JUtils.getSignatureString(method);
+
+        // VERIFY
+        assertThat(signature)
+                .isEqualTo(
+                        "void methodD(int, boolean, String, a.b.c.TestIntf, String)");
 
     }
 
