@@ -48,6 +48,8 @@ import org.emftext.language.java.resource.java.mopp.JavaResource;
 import org.fuin.srcmixins4j.annotations.MixinProvider;
 import org.fuin.srcmixins4j.core.SrcMixins4JAnalyzerContext;
 import org.fuin.srcmixins4j.core.SrcMixins4JUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Context used in Eclipse when analyzing source files to apply or remove mixin
@@ -55,6 +57,9 @@ import org.fuin.srcmixins4j.core.SrcMixins4JUtils;
  */
 public final class SrcMixins4JAnalyzerEclipseContext implements
         SrcMixins4JAnalyzerContext {
+
+    private static final Logger LOG = LoggerFactory
+            .getLogger(SrcMixins4JAnalyzerEclipseContext.class);
 
     private final IJavaProject project;
 
@@ -128,6 +133,11 @@ public final class SrcMixins4JAnalyzerEclipseContext implements
     @Override
     public final Class findMixinProvider(final Interface mixinIntf) {
 
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN findMixinProvider(Interface)");
+            LOG.trace("mixinIntf: " + mixinIntf);
+        }
+
         if (mixinIntf == null) {
             throw new IllegalArgumentException("mixinIntf == null");
         }
@@ -151,9 +161,17 @@ public final class SrcMixins4JAnalyzerEclipseContext implements
                         .getSingleAnnotationRefElementParameter(ai,
                                 Interface.class);
                 if (intf == mixinIntf) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("clasz: " + clasz);
+                        LOG.trace("END findMixinProvider(Interface)");
+                    }
                     return clasz;
                 }
             }
+        }
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("clasz: null");
+            LOG.trace("END findMixinProvider(Interface)");
         }
         return null;
 
@@ -162,6 +180,11 @@ public final class SrcMixins4JAnalyzerEclipseContext implements
     @Override
     public final List<Class> findMixinUsers(final Interface mixinIntf) {
 
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("BEGIN findMixinUsers(Interface)");
+            LOG.trace("mixinIntf: " + mixinIntf);
+        }
+        
         if (mixinIntf == null) {
             throw new IllegalArgumentException("mixinIntf == null");
         }
@@ -182,17 +205,32 @@ public final class SrcMixins4JAnalyzerEclipseContext implements
                 list.add((Class) cc);
             }
         }
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("list: " + list);
+            LOG.trace("END findMixinUsers(Interface)");
+        }
         return list;
     }
 
     @Override
-    public final void addWarning(final Classifier classifier, final String message) {
+    public final void addWarning(final Classifier classifier,
+            final String message) {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("addWarning(Classifier, String)");
+            LOG.info("classifier: " + classifier);
+            LOG.info("message: " + message);
+        }
         ((JavaResource) classifier.eResource()).addWarning(message,
                 JavaEProblemType.BUILDER_ERROR, classifier);
     }
-    
+
     @Override
     public final void addError(final Classifier classifier, final String message) {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("addError(Classifier, String)");
+            LOG.info("classifier: " + classifier);
+            LOG.info("message: " + message);
+        }
         ((JavaResource) classifier.eResource()).addError(message,
                 JavaEProblemType.BUILDER_ERROR, classifier);
     }

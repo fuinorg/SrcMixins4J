@@ -51,7 +51,7 @@ public final class SrcMixins4JPlugin extends Plugin {
     @Override
     public final void start(final BundleContext context) throws Exception {
         super.start(context);
-        LOG.trace("BEGIN start(BundleContext");
+        LOG.trace("BEGIN start(BundleContext)");
         plugin = this;
         cpChangeListener = new IElementChangedListener() {
             @Override
@@ -63,17 +63,17 @@ public final class SrcMixins4JPlugin extends Plugin {
             }
         };
         JavaCore.addElementChangedListener(cpChangeListener);
-        LOG.trace("END start(BundleContext");
+        LOG.trace("END start(BundleContext)");
     }
 
     @Override
     public final void stop(final BundleContext context) throws Exception {
-        LOG.trace("BEGIN stop(BundleContext");
+        LOG.trace("BEGIN stop(BundleContext)");
         JavaCore.removeElementChangedListener(cpChangeListener);
         plugin = null;
         cpChangeListener = null;
         super.stop(context);
-        LOG.trace("END stop(BundleContext");
+        LOG.trace("END stop(BundleContext)");
     }
 
     /**
@@ -96,16 +96,13 @@ public final class SrcMixins4JPlugin extends Plugin {
      */
     public final ResourceSet getResourceSet(final IJavaProject project) {
         if (LOG.isTraceEnabled()) {
-            LOG.trace("BEGIN getResourceSet(IJavaProject");
+            LOG.trace("BEGIN getResourceSet(IJavaProject)");
             LOG.trace("project: " + project.getElementName());
         }
 
         if (resourceSet == null) {
             LOG.info("Create new ResourceSet");
             resourceSet = new ResourceSetImpl();
-            resourceSet.getLoadOptions().put(
-                    IJavaOptions.DISABLE_CREATING_MARKERS_FOR_PROBLEMS,
-                    Boolean.FALSE);
         }
 
         if (!project.equals(currentProject)) {
@@ -117,7 +114,7 @@ public final class SrcMixins4JPlugin extends Plugin {
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("resourceSet: " + resourceSet);
-            LOG.trace("END getResourceSet(IJavaProject");
+            LOG.trace("END getResourceSet(IJavaProject)");
         }
         return resourceSet;
     }
