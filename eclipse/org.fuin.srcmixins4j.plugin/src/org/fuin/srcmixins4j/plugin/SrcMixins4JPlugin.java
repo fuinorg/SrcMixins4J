@@ -105,7 +105,7 @@ public final class SrcMixins4JPlugin extends Plugin {
             resourceSet = new ResourceSetImpl();
             resourceSet.getLoadOptions().put(
                     IJavaOptions.DISABLE_CREATING_MARKERS_FOR_PROBLEMS,
-                    Boolean.TRUE);
+                    Boolean.FALSE);
         }
 
         if (!project.equals(currentProject)) {
