@@ -65,7 +65,7 @@ public final class SrcMixins4JCompilationParticipant extends
             // Nothing to do...
             return;
         }
-        
+
         final ResourceSet resourceSet = SrcMixins4JPlugin.getDefault()
                 .getResourceSet(project);
 
@@ -77,7 +77,7 @@ public final class SrcMixins4JCompilationParticipant extends
 
     @Override
     public final void buildFinished(final IJavaProject project) {
-        if (LOG.isInfoEnabled()) {
+        if (LOG.isDebugEnabled()) {
             final ResourceSet resourceSet = SrcMixins4JPlugin.getDefault()
                     .getResourceSet(project);
             dumpClassPath(project, resourceSet);
@@ -87,32 +87,24 @@ public final class SrcMixins4JCompilationParticipant extends
 
     // @formatter:off
     private static void dumpClassPath(final IJavaProject project, final ResourceSet resourceSet) {
-        LOG.info("PROJECT: " + project.getElementName());
+        LOG.debug("PROJECT: " + project.getElementName());
         if (resourceSet == null) {
             LOG.info("RESOURCE SET: null");
             return;
         }
-        LOG.info("RESOURCE SET: " + resourceSet.eAdapters().size()
+        LOG.debug("RESOURCE SET: " + resourceSet.eAdapters().size()
                 + " eAdapters");
         for (final Adapter a : resourceSet.eAdapters()) {
-            LOG.info("ADAPTER: " + a);
+            LOG.debug("ADAPTER: " + a);
             if (a instanceof JavaClasspath) {
                 final JavaClasspath cp = (JavaClasspath) a;
                 final Map<String, List<String>> pcMap = cp
                         .getPackageClassifierMap();
-                LOG.info("JavaClasspath: " + pcMap.size() + " keys");
+                LOG.debug("JavaClasspath: " + pcMap.size() + " keys");
                 final Iterator<String> it = pcMap.keySet().iterator();
                 while (it.hasNext()) {
                     final String key = it.next();
-                    if (!(key.startsWith("java.") || key.startsWith("javax.")
-                            || key.startsWith("com.") || key.startsWith("sun.")
-                            || key.startsWith("org.jcp.")
-                            || key.startsWith("org.w3c.")
-                            || key.startsWith("org.omg.")
-                            || key.startsWith("org.xml.")
-                            || key.startsWith("org.ietf.")
-                            || key.startsWith("sunw.") || key
-                                .startsWith("zkasig."))) {
+                    if (LOG.isTraceEnabled() || !isExcluded(key)) {
                         final StringBuilder sb = new StringBuilder(key + ": ");
                         final List<String> values = pcMap.get(key);
                         for (int i = 0; i < values.size(); i++) {
@@ -121,12 +113,31 @@ public final class SrcMixins4JCompilationParticipant extends
                             }
                             sb.append("[" + i + "]=" + values.get(i));
                         }
-                        LOG.info("CP KEY: " + sb.toString());
-                    }                    
+                        LOG.debug("CP KEY: " + sb.toString());
+                    }
                 }
             }
         }
     }
-   // @formatter:on
+    // @formatter:on
+
+    private static boolean isExcluded(final String key) {
+        // @formatter:off
+        return key.startsWith("java.") 
+                || key.startsWith("javax.")
+                || key.startsWith("com.") 
+                || key.startsWith("sun.")
+                || key.startsWith("org.jcp.")
+                || key.startsWith("org.w3c.")
+                || key.startsWith("org.omg.")
+                || key.startsWith("org.xml.")
+                || key.startsWith("org.ietf.")
+                || key.startsWith("sunw.") 
+                || key.startsWith("zkasig.")
+                || key.startsWith("oracle.")
+                || key.startsWith("javafx.")                            
+                || key.startsWith("netscape.");
+        // @formatter:on
+    }
 
 }
