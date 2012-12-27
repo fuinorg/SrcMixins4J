@@ -1,4 +1,4 @@
-package org.fuin.mixins4j.maven.test;
+package org.fuin.srcmixins4j.test;
 
 import org.fuin.srcmixins4j.annotations.MixinGenerated;
 import org.fuin.srcmixins4j.annotations.MixinProvider;

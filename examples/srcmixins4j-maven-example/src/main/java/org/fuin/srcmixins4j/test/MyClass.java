@@ -1,12 +1,11 @@
-package org.fuin.mixins4j.maven.test;
+package org.fuin.srcmixins4j.test;
 
 import org.fuin.srcmixins4j.annotations.MixinGenerated;
 
-
-public class NamedMixinUser implements NamedMixin<String>, DuplicateNamedMixin {
+public class MyClass extends MyParent implements NamedMixin<MyName> {
 
 	@MixinGenerated(NamedMixinProvider.class)
-	private String name;
+	private MyName name;
 
 	/**
 	 * Sets the name to a new value.
@@ -15,13 +14,13 @@ public class NamedMixinUser implements NamedMixin<String>, DuplicateNamedMixin {
 	 *            Value to set.
 	 */
 	@MixinGenerated(NamedMixinProvider.class)
-	public final void setName(final String name) {
+	public final void setName(final MyName name) {
 		this.name = name;
 	}
 
 	@Override
 	@MixinGenerated(NamedMixinProvider.class)
-	public final String getName() {
+	public final MyName getName() {
 		return name;
 	}
 

@@ -8,18 +8,18 @@
         <version>0.2.0</version>
     </parent>
 
-    <artifactId>srcmixins4j-maven-plugin-test</artifactId>
-    <name>SrcMixins4J Maven Plugin Test</name>
+    <artifactId>srcmixins4j-maven-example</artifactId>
+    <name>SrcMixins4J Maven Plugin Example</name>
 
     <dependencies>
 
         <!-- compile -->
 
-		<dependency>
-			<groupId>org.fuin.srcmixins4j</groupId>
-			<artifactId>srcmixins4j-annotations</artifactId>
-			<version>0.2.0</version>
-		</dependency>
+        <dependency>
+            <groupId>org.fuin.srcmixins4j</groupId>
+            <artifactId>srcmixins4j-annotations</artifactId>
+            <version>0.2.0</version>
+        </dependency>
 
         <!-- test -->
 
@@ -36,7 +36,7 @@
 
         <pluginManagement>
 
-            <!-- Needed for Eclipse M2E to configure the plugin below -->
+            <!-- Only needed for Eclipse M2E to configure the plugin below -->
             <plugins>
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>

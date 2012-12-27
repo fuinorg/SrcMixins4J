@@ -1,4 +1,4 @@
-package org.fuin.mixins4j.maven.test;
+package org.fuin.srcmixins4j.test;
 
 /**
  * An object with a name.
