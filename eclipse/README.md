@@ -18,7 +18,7 @@ Installation
    [This is a known bug - Will be solved soon]
 9. Project / Clean "srcmixins4j-eclipse-example"
 10. Open [AnotherClass](https://github.com/fuinorg/SrcMixins4J/blob/master/examples/srcmixins4j-eclipse-example/src/org/fuin/srcmixins4j/test/AnotherClass.java), 
-add "implements NamedMixin<String>" and save your changes. If everything works, the mixin code is added.
+add "implements NamedMixin&lt;String&gt;" and save your changes. If everything works, the mixin code is added.
 
 Screen Movie
 ------------
