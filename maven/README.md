@@ -26,3 +26,5 @@ Add the following code to the "plugins" section of your Maven POM:
 ```
 
 If you use Eclipse M2E you'll have to add a configuration for the above plugin the the "pluginManagement" section.
+
+You can find a full POM example [here](https://github.com/fuinorg/SrcMixins4J/blob/master/examples/srcmixins4j-maven-example/pom.xml).
