@@ -8,12 +8,14 @@ Installation
 
 1. Inside Eclipse click menu "Help / Install New Software..."
 2. Press "Add" button to add the repository: http://www.fuin.org/p2-repository
-3. Install "JaMoPP (Java Model Parser and Printer)" [CAUTION: Installation together with "SrcMixins4J" in one step does currently not work] 
+3. Install "JaMoPP (Java Model Parser and Printer)"  
+   [CAUTION: Installation together with "SrcMixins4J" in one step does currently not work] 
 4. Restart Eclipse
 5. Install "SrcMixins4J"
 6. Restart Eclipse
-7. Import "srcmixins4j-eclipse-example" as "existing project" into workspace
-8. Ignore the build error and restart Eclipse [This is a known bug - Will be solved soon]
+7. Import [srcmixins4j-eclipse-example](https://github.com/fuinorg/SrcMixins4J/tree/master/examples/srcmixins4j-eclipse-example) from GitHub into your workspace
+8. Ignore the build error and restart Eclipse  
+   [This is a known bug - Will be solved soon]
 9. Project / Clean "srcmixins4j-eclipse-example"
 
 Screen Movie
