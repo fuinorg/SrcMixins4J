@@ -20,4 +20,5 @@ Screen Movie
 ------------
 
 [![ScreenShot](https://raw.github.com/fuinorg/SrcMixins4J/master/eclipse/srcmixins4j-eclipse-example.jpg)](http://www.fuin.org/files/srcmixins4j-eclipse-example.swf)
+
 (Requires Adobe Flash Player)
