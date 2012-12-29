@@ -14,13 +14,9 @@ Require-Bundle: org.eclipse.ui,
  org.emftext.language.java.resource,
  org.emftext.language.java.resource.java,
  org.fuin.srcmixins4j.annotations;bundle-version="0.2.0",
- org.fuin.srcmixins4j.core;bundle-version="0.2.0"
+ org.fuin.srcmixins4j.core;bundle-version="0.2.0",
+ slf4j.api;bundle-version="1.6.6"
 Bundle-Activator: org.fuin.srcmixins4j.plugin.SrcMixins4JPlugin
-Import-Package: 
- org.fuin.srcmixins4j.annotations;version="0.2.0",
- org.fuin.srcmixins4j.core;version="0.2.0",
- org.slf4j;provider=paxlogging,
- org.apache.log4j;provider=paxlogging
 Export-Package: org.fuin.srcmixins4j.annotations;version="0.2.0",
  org.fuin.srcmixins4j.core;version="0.2.0",
  org.fuin.srcmixins4j.plugin;version="0.2.0"
