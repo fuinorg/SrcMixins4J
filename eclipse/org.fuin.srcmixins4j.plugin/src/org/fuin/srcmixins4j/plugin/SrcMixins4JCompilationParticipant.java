@@ -21,12 +21,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.compiler.BuildContext;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 import org.emftext.language.java.JavaClasspath;
+import org.fuin.srcmixins4j.SrcMixins4JNature;
 import org.fuin.srcmixins4j.core.SrcMixins4JAnalyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,8 @@ public final class SrcMixins4JCompilationParticipant extends
 
     private IJavaProject project;
 
+    private boolean srcMixins4JProject = false;
+
     @Override
     public final boolean isActive(final IJavaProject project) {
         return true;
@@ -51,6 +55,21 @@ public final class SrcMixins4JCompilationParticipant extends
     public int aboutToBuild(final IJavaProject project) {
         LOG.info("aboutToBuild: " + project.getElementName());
         this.project = project;
+
+        // Is this a SrcMixins4J project?
+        try {
+            srcMixins4JProject = false;
+            final String[] natureIds = project.getProject().getDescription()
+                    .getNatureIds();
+            for (final String natureId : natureIds) {
+                if (SrcMixins4JNature.NATURE_ID.endsWith(natureId)) {
+                    srcMixins4JProject = true;
+                }
+            }
+        } catch (final CoreException ex) {
+            LOG.error("Couldn't get project's nature IDs", ex);
+        }
+
         return READY_FOR_BUILD;
     }
 
@@ -58,11 +77,16 @@ public final class SrcMixins4JCompilationParticipant extends
     public final void buildStarting(final BuildContext[] buildContexts,
             final boolean isBatch) {
 
-        LOG.info("buildStarting: batch=" + isBatch + ", annotationProcessor="
-                + isAnnotationProcessor());
+        LOG.info("buildStarting: project=" + project.getElementName()
+                + "batch=" + isBatch + ", srcMixins4JProject="
+                + srcMixins4JProject);
 
         if (buildContexts.length == 0) {
             // Nothing to do...
+            return;
+        }
+        if (!srcMixins4JProject) {
+            // Don't handle projects without SrcMixins4JNature
             return;
         }
 
@@ -82,7 +106,7 @@ public final class SrcMixins4JCompilationParticipant extends
                     .getResourceSet(project);
             dumpClassPath(project, resourceSet);
         }
-        LOG.info("buildFinished: " + project.getElementName());
+        LOG.info("buildFinished: project=" + project.getElementName());
     }
 
     // @formatter:off

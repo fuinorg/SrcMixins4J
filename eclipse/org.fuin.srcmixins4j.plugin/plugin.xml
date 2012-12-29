@@ -9,4 +9,10 @@
       </compilationParticipant>
    </extension>
 
+   <extension id="srcMixins4JNature" name="SrcMixins4J" point="org.fuin.srcmixins4">
+      <runtime>
+         <run class="org.fuin.srcmixins4.SrcMixins4JNature" />
+      </runtime>      
+	</extension>
+
 </plugin>
