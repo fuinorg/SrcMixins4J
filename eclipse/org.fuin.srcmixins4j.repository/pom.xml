@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.fuin.srcmixins4j</groupId>
 		<artifactId>srcmixins4j-eclipse-parent</artifactId>
-		<version>0.2.0</version>
+		<version>0.2.1</version>
 	</parent>
 
 	<artifactId>org.fuin.srcmixins4j.repository</artifactId>

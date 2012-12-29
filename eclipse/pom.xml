@@ -10,7 +10,7 @@
 
     <groupId>org.fuin.srcmixins4j</groupId>
     <artifactId>srcmixins4j-eclipse-parent</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
     <packaging>pom</packaging>
     <name>SrcMixins4J Eclipse Parent</name>
     <description>Source code based mixins for Java / Eclipse Parent</description>

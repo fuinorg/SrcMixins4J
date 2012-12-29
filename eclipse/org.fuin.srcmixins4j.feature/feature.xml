@@ -2,7 +2,7 @@
 <feature
       id="org.fuin.srcmixins4j.feature"
       label="SrcMixins4J"
-      version="0.2.0"
+      version="0.2.1"
       provider-name="fuin.org">
 
    <description>
@@ -21,7 +21,7 @@
          id="org.fuin.srcmixins4j.plugin"
          download-size="0"
          install-size="0"
-         version="0.2.0"
+         version="0.2.1"
          unpack="false"/>
 
 </feature>
