@@ -20,6 +20,19 @@ Installation
 10. Open [AnotherClass](https://github.com/fuinorg/SrcMixins4J/blob/master/examples/srcmixins4j-eclipse-example/src/org/fuin/srcmixins4j/test/AnotherClass.java), 
 add "implements NamedMixin&lt;String&gt;" and save your changes. If everything works, the mixin code is added.
 
+**IMPORTANT**: Make sure that you always add a "srcMixins4JNature" to the Eclipse ".project" file if you want to use SrcMixins4J:
+```xml
+<projectDescription>
+	...
+	<natures>
+		...
+		<nature>org.fuin.srcmixins4.srcMixins4JNature</nature>
+	</natures>
+</projectDescription>
+```
+
+
+
 Screen Movie
 ------------
 
