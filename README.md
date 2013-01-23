@@ -10,3 +10,11 @@ The project has four parts:
 * examples - Example projects that show the usage in Eclipse or with Maven
 
 
+Screen Movie
+------------
+
+Shows usage of the Eclipse plugin:
+
+[![ScreenShot](https://raw.github.com/fuinorg/SrcMixins4J/master/eclipse/srcmixins4j-eclipse-example.jpg)](http://www.fuin.org/files/srcmixins4j-eclipse-example.swf)
+
+(Requires Adobe Flash Player to run)
