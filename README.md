@@ -15,6 +15,6 @@ Screen Movie
 
 Shows usage of the Eclipse plugin:
 
-[![ScreenShot](https://raw.github.com/fuinorg/srcmixins4j-eclipse/master/eclipse/srcmixins4j-eclipse-example.jpg)](http://www.fuin.org/files/srcmixins4j-eclipse-example.swf)
-               
+[![ScreenShot](https://raw.github.com/fuinorg/srcmixins4j-eclipse/master/srcmixins4j-eclipse-example.jpg)](http://www.fuin.org/files/srcmixins4j-eclipse-example.swf)
+
 (Requires Adobe Flash Player to run)
